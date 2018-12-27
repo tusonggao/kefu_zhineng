@@ -1,3 +1,0 @@
-buyuservisits_wanzheng.json
-
-select * from dbo.BuyUserVisit where CreationDate>='2018-05-01 00:00:00' and CreationDate<='2018-11-02 00:00:00' order by CreationDate;
