@@ -1,0 +1,10 @@
+select id, max(buy_user_id) buy_user_id, max(operate_id) operate_id, max(creation_date) creation_date
+from(
+select b.id id, b.buy_user_id buy_user_id, b.operate_id operate_id, b.creation_date creation_date
+from jkbd.orders a join jkbd.buy_user_visit b
+where a.creation_date>='2017-01-01 00:00:00' and a.dept_code like '0003%' and a.origin_type=26
+and a.operate_id=b.operate_id and a.buy_user_id=b.buy_user_id
+and to_date(a.creation_date)<=date_add(b.creation_date, 30) and a.creation_date>b.creation_date
+and a.order_status in (50, 150)
+)t
+group by id order by creation_date;
