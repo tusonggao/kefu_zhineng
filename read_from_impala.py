@@ -5,7 +5,7 @@
 # dn05: 172.21.57.127
 
 # nm01: 172.21.57.128
-# dn02: 172.21.57.129
+# nm02: 172.21.57.129
 
 ###############################################################
 
@@ -18,9 +18,6 @@ def read_sql_script(sql_file):
 	with open(sql_file) as file:
 		sql_str = ' '.join([line.strip() for line in file])
 	return sql_str
-
-
-
 
 
 # with open("./111.json", 'r', encoding='UTF-8') as f:
@@ -37,7 +34,7 @@ from sqlalchemy import create_engine
 start_t = time.time()
 
 conn_impala = create_engine('impala://172.21.57.127:21050')
-sql = 'show databases;'
+# sql = 'show databases;'
 sql = read_sql_script('./sql_scripts/hive_sql_5.txt')
 print('sql is ', sql)
 df = pd.read_sql(sql, conn_impala)
@@ -48,6 +45,6 @@ print('df.shape is', df.shape)
 print('df.head() is', df.head())
 print('read data cost time ', end_t-start_t)
 
-df.to_csv('./hive_sql_5_output.csv')
+df.to_csv('./data/hive_sql_5_output.csv')
 
 
