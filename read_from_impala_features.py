@@ -16,12 +16,22 @@ import pandas as pd
 
 
 def read_sql_script(sql_file):
+    sql_str = ''
     with open(sql_file) as file:
-        sql_str = ' '.join([line.strip() for line in file])
+        for line in file:
+            content = line.strip()
+            if content.find('/*')!=-1 and content.find('*/')!=-1:
+                start_idx = content.index('/*')
+                end_idx = content.index('*/')
+                print('start_idx, end_idx ', start_idx, end_idx)
+                content = content[:start_idx] + content[end_idx+2:]
+            sql_str += ' ' + content
     return sql_str
 
+print(read_sql_script('./sql_scripts/hive_sql_1_test.txt'))
+sss = 'aaa ttt bbb ccc'
+print('sss part of is ', sss[100:])
 
-def read_
 
 # with open("./111.json", 'r', encoding='UTF-8') as f:
 # with open('./wanzheng.json', 'r', encoding='UTF-8') as f:
@@ -33,21 +43,21 @@ def read_
 # print('hello world!')
 
 
-start_t = time.time()
+# start_t = time.time()
 
-print('reading start...')
-conn_impala = create_engine('impala://172.21.57.127:21050')
-# conn_impala = create_engine('hive://172.21.57.127:21050')
-# sql = 'show databases;'
-# sql = read_sql_script('./sql_scripts/hive_sql_5.txt')
-sql = read_sql_script('./sql_scripts/hive_sql_1.txt')
-print('sql is ', sql)
-df = pd.read_sql(sql, conn_impala)
+# print('reading start...')
+# conn_impala = create_engine('impala://172.21.57.127:21050')
+# # conn_impala = create_engine('hive://172.21.57.127:21050')
+# # sql = 'show databases;'
+# # sql = read_sql_script('./sql_scripts/hive_sql_5.txt')
+# sql = read_sql_script('./sql_scripts/hive_sql_1.txt')
+# print('sql is ', sql)
+# df = pd.read_sql(sql, conn_impala)
 
-end_t = time.time()
-print('df.shape is', df.shape)
+# end_t = time.time()
+# print('df.shape is', df.shape)
 
-print('df.head() is', df.head())
-print('read data cost time ', end_t-start_t)
+# print('df.head() is', df.head())
+# print('read data cost time ', end_t-start_t)
 
-df.to_csv('./data/hive_sql_1_output.csv', index=0)
+# df.to_csv('./data/hive_sql_1_output.csv', index=0)
