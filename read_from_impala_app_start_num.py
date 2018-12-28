@@ -6,6 +6,10 @@ from sqlalchemy import create_engine
 
 ###############################################################
 
+# 得到用户app最近3天以来app启动次数
+
+###############################################################
+
 def read_sql_script(sql_file):
     sql_str = ''
     with open(sql_file, encoding='UTF-8') as file:
@@ -19,13 +23,11 @@ def read_sql_script(sql_file):
             sql_str += ' ' + content
     return sql_str
 
-
 def basefilename(full_file_name):
     file_name = os.path.split(full_file_name)[-1]
     raw_file_name = os.path.splitext(file_name)[0]
     print('raw_file_name is', raw_file_name)
     return raw_file_name
-    
 
 # print(basefilename('test.csv'))
 # print(basefilename('c:/csv/test.csv'))

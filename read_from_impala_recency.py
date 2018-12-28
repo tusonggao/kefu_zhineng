@@ -19,13 +19,11 @@ def read_sql_script(sql_file):
             sql_str += ' ' + content
     return sql_str
 
-
 def basefilename(full_file_name):
     file_name = os.path.split(full_file_name)[-1]
     raw_file_name = os.path.splitext(file_name)[0]
     print('raw_file_name is', raw_file_name)
     return raw_file_name
-    
 
 # print(basefilename('test.csv'))
 # print(basefilename('c:/csv/test.csv'))
