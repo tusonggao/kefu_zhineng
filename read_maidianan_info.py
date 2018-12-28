@@ -12,22 +12,24 @@ start_t = time.time()
 
 sql = '''select u.second_id account_id, date, count(1) cnt 
 from events e inner join users u on u.id = e.user_id 
-where event='$AppStart' and date>='2018-05-01' and date<='2018-06-10' 
+where event='$AppStart' and date>='2017-01-01'
 group by u.second_id, date order by u.second_id, date {sql_tag}; '''.format(sql_tag=sql_tag)
 
 print(sql)
-df = pd.read_sql(sql, conn_sa)
+# df = pd.read_sql(sql, conn_sa)
 
-end_t = time.time()
-print('read_sql cost time: ', end_t-start_t)
+# end_t = time.time()
+# print('read_sql cost time: ', end_t-start_t)
 
-start_t = time.time()
-df.to_csv('df_maidian_small.csv')
-end_t = time.time()
-print('read_sql cost time: ', end_t-start_t)
+# start_t = time.time()
+# df.to_csv('./data/df_maidian_info.csv')
+# end_t = time.time()
+# print('read_sql cost time: ', end_t-start_t)
 
-print(df.head(5))
-print('df.shape is ', df.shape)
+# print(df.head(5))
+# print('df.shape is ', df.shape)
+
+df.read_csv()
 
 
 
