@@ -21,6 +21,8 @@ def read_sql_script(sql_file):
     return sql_str
 
 
+def read_
+
 # with open("./111.json", 'r', encoding='UTF-8') as f:
 # with open('./wanzheng.json', 'r', encoding='UTF-8') as f:
 #     temp = json.loads(f.read())
