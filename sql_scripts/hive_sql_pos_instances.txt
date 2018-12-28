@@ -1,5 +1,4 @@
 /*    得到回访30天内有成交的回访记录，作为正样例    */
-
 select id, max(buy_user_id) buy_user_id, max(operate_id) operate_id, max(creation_date) creation_date
 from(
 select b.id id, b.buy_user_id buy_user_id, b.operate_id operate_id, b.creation_date creation_date
