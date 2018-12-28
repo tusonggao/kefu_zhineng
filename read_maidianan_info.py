@@ -29,7 +29,15 @@ print(sql)
 # print(df.head(5))
 # print('df.shape is ', df.shape)
 
-df.read_csv()
+df = pd.read_csv('./data/df_maidian_info.csv', index_col=0)
+
+df_new = df.pivot(index='date', columns='account_id', values='cnt')
+
+print('df.head is ', df.head(5))
+print('df.shape is ', df.shape)
+
+print('df_new.head is ', df_new.head(5))
+print('df_new.shape is ', df_new.shape)
 
 
 

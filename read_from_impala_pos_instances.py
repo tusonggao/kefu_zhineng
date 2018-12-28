@@ -25,7 +25,7 @@ def basefilename(full_file_name):
     raw_file_name = os.path.splitext(file_name)[0]
     print('raw_file_name is', raw_file_name)
     return raw_file_name
-    
+
 
 # print(basefilename('test.csv'))
 # print(basefilename('c:/csv/test.csv'))
@@ -68,7 +68,9 @@ def read_and_store_df_from_impala(sql_file):
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
-df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
+
+df = read_and_store_df_from_impala('./sql_scripts/buyuserid_accountid_map.txt')
 
 
 # end_t = time.time()
