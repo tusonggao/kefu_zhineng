@@ -29,9 +29,7 @@ def basefilename(full_file_name):
 # print(basefilename('c:/csv/test.csv'))
 # print(basefilename('./test.csv'))
 
-
 def read_and_store_df_from_impala(sql_file):
-    sql_str = read_sql_script(sql_file)
     print('reading start...')
 
     start_t = time.time()
@@ -45,8 +43,6 @@ def read_and_store_df_from_impala(sql_file):
     print('df.shape is', df.shape)
     print('df.head() is', df.head())
 
-    # if sql_file.find('.')!=-1:
-    #     sql_file = sql_file[:sql_file.find('.')]
     output_file = basefilename(sql_file) + '_data.csv'
     df.to_csv('./data/'+output_file, index=0)
 
@@ -68,8 +64,9 @@ def read_and_store_df_from_impala(sql_file):
 
 # './sql_scripts/hive_sql_pos_instances.txt')
 
-df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
 
 
 # end_t = time.time()

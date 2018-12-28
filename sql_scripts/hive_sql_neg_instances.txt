@@ -1,11 +1,11 @@
-/*    得到回访30天内有成交的回访记录，然后去重，作为正样例    */
-select id, max(buy_user_id) buy_user_id, max(operate_id) operate_id, max(creation_date) creation_date
-from(
-select b.id id, b.buy_user_id buy_user_id, b.operate_id operate_id, b.creation_date creation_date
-from jkbd.orders a join jkbd.buy_user_visit b
-where a.creation_date>='2017-01-01 00:00:00' and a.dept_code like '0003%' and a.origin_type=26
-and a.operate_id=b.operate_id and a.buy_user_id=b.buy_user_id
-and to_date(a.creation_date)<=date_add(b.creation_date, 30) and a.creation_date>b.creation_date
-and a.order_status in (50, 150)
-)t
-group by id order by creation_date;
+/*    得到回访30天内没有成交的回访记录，然后随机选择500万个，作为负样例    */
+select t.id id, t.buy_user_id buy_user_id, t.operate_id operate_id, t.creation_date creation_date
+from
+(
+select id, buy_user_id, operate_id, creation_date
+from jkbd.buy_user_visit_parquet
+where id not in (
+     select visit_id from bigdata_ai.positive_buyuser_tsg)
+and creation_date>='2017-01-01 00:00:00'
+order by rand() limit 5000000)t
+order by t.creation_date;
