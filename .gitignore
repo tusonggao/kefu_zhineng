@@ -1,7 +1,6 @@
 # my defined file types
 *.mylogs
 *.tsg
-*.csv
 ~*.*
 data/
 
