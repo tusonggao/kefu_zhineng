@@ -1,0 +1,13 @@
+/*  Frequency: 训练样例中所有buy_user_id的距离当前时间之前的购买次数  */
+select buy_user_id, creation_date, buy_cnt from
+(
+select b.buy_user_id buy_user_id, b.creation_date creation_date, count(*) buy_cnt
+from jkbd.orders_parquet a join 
+(select buy_user_id, creation_date
+from bigdata_ai.merged_buyuser_tsg
+group by buy_user_id, creation_date) b
+where a.buy_user_id=b.buy_user_id and date_add(a.creation_date, 1)<=to_date(b.creation_date)
+and a.order_status in (50, 150)
+group by b.buy_user_id, b.creation_date
+) t
+order by t.creation_date;

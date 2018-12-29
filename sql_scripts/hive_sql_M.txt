@@ -1,0 +1,10 @@
+/*    训练样例中所有buy_user_id的距离当前时间的最近一次购买的时间 Recency  */
+select buy_user_id, creation_date, sum_cost from
+(
+select b.buy_user_id buy_user_id, b.creation_date creation_date, sum(a.creation_date) recency_date
+from jkbd.orders_parquet a join bigdata_ai.merged_buyuser_tsg b
+where a.buy_user_id=b.buy_user_id and a.creation_date < b.creation_date 
+and a.order_status in (50, 150)
+group by b.buy_user_id, b.creation_date
+) t
+order by t.recency_date;

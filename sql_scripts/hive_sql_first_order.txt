@@ -1,0 +1,11 @@
+/*    训练样例中所有buy_user_id的第一次购买订单时间  */
+select buy_user_id, creation_date from
+(
+select a.buy_user_id buy_user_id, min(a.creation_date) creation_date
+from jkbd.orders_parquet a
+where a.buy_user_id in (
+     select distinct buy_user_id from bigdata_ai.merged_buyuser_tsg)
+and a.order_status in (50, 150)
+group by a.buy_user_id
+) t
+order by t.creation_date;

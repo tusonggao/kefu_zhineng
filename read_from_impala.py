@@ -1,24 +1,52 @@
-# dn01: 172.21.57.123
-# dn02: 172.21.57.124
-# dn03: 172.21.57.125
-# dn04: 172.21.57.126
-# dn05: 172.21.57.127
-
-# nm01: 172.21.57.128
-# nm02: 172.21.57.129
-
-###############################################################
-
-from sqlalchemy import create_engine
+import os
 import json
 import time
 import pandas as pd
+from sqlalchemy import create_engine
 
+###############################################################
 
 def read_sql_script(sql_file):
-    with open(sql_file) as file:
-        sql_str = ' '.join([line.strip() for line in file])
+    sql_str = ''
+    with open(sql_file, encoding='UTF-8') as file:
+        for line in file:
+            content = line.strip()
+            if content.find('/*')!=-1 and content.find('*/')!=-1:
+                start_idx = content.index('/*')
+                end_idx = content.index('*/')
+                print('start_idx, end_idx ', start_idx, end_idx)
+                content = content[:start_idx] + content[end_idx+2:]
+            sql_str += ' ' + content
     return sql_str
+
+def basefilename(full_file_name):
+    file_name = os.path.split(full_file_name)[-1]
+    raw_file_name = os.path.splitext(file_name)[0]
+    print('raw_file_name is', raw_file_name)
+    return raw_file_name
+
+# print(basefilename('test.csv'))
+# print(basefilename('c:/csv/test.csv'))
+# print(basefilename('./test.csv'))
+
+def read_and_store_df_from_impala(sql_file):
+    print('reading start...')
+
+    start_t = time.time()
+    conn_impala = create_engine('impala://172.21.57.127:21050')
+    sql = read_sql_script(sql_file)
+    print('sql is ', sql)
+    df = pd.read_sql(sql, conn_impala)
+    end_t = time.time()
+
+    print('read data from impala cost time ', end_t-start_t)
+    print('df.shape is', df.shape)
+    print('df.head() is', df.head())
+
+    output_file = basefilename(sql_file) + '_data.csv'
+    df.to_csv('./data/'+output_file, index=0)
+
+    return df
 
 
 # with open("./111.json", 'r', encoding='UTF-8') as f:
@@ -29,26 +57,25 @@ def read_sql_script(sql_file):
 #     print(len(temp['RECORDS']))
 #     print(temp['RECORDS'][1]['Id'])
 # print('hello world!')
+# conn_impala = create_engine('hive://172.21.57.127:21050')
+# sql = 'show databases;'
+# sql = read_sql_script('./sql_scripts/hive_sql_5.txt')
 
 
-start_t = time.time()
+# './sql_scripts/hive_sql_pos_instances.txt')
 
-# print('reading start...')
-# conn_impala = create_engine('impala://172.21.57.127:21050')
-# # conn_impala = create_engine('hive://172.21.57.127:21050')
-# # sql = 'show databases;'
-# # sql = read_sql_script('./sql_scripts/hive_sql_5.txt')
-# sql = read_sql_script('./sql_scripts/hive_sql_1.txt')
-# print('sql is ', sql)
-# df = pd.read_sql(sql, conn_impala)
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
+
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
+
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_R.txt')
+
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_F.txt')
 
 # end_t = time.time()
 # print('df.shape is', df.shape)
-
 # print('df.head() is', df.head())
 # print('read data cost time ', end_t-start_t)
-
 # df.to_csv('./data/hive_sql_1_output.csv', index=0)
-
-df.read_csv('./data/hive_sql_5_output.csv', index=0)
-print('df.shape is ', df.shape)

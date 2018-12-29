@@ -22,4 +22,4 @@ print('df_neg head is ', df_neg.head(3))
 print('df_merged is ', df_merged.shape)
 print('df_merged sample is ', df_merged.sample(10))
 
-df_merged[['buy_user_id', 'creation_date', 'y']].to_csv('./data/hive_sql_merged_instances.csv')
+df_merged[['buy_user_id', 'creation_date', 'y']].to_csv('./data/hive_sql_merged_instances.csv', sep='\t', index=0)
