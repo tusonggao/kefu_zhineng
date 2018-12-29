@@ -17,14 +17,11 @@ from sklearn.metrics import mean_squared_error
 
 from sklearn.model_selection import train_test_split
 
-
 random_seed = 42
 np.random.seed(random_seed)
 
-
 def convert_2_md5(value):
     return hashlib.md5(str(value).encode('utf-8')).hexdigest()
-
 
 def split_by_user_id(df_merged, train_ratio=0.67):
     df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
@@ -33,7 +30,7 @@ def split_by_user_id(df_merged, train_ratio=0.67):
 
     df_merged_sorted = df_merged.sort_values(by=['md5_val'])
     # print('df_merged_sorted head is ', df_merged_sorted.head(5))
-    df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', date_format='%Y/%m/%d', index=0)  # date_format='%Y-%m-%d %H:%M:%s'
+    # df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', date_format='%Y/%m/%d', index=0)  # date_format='%Y-%m-%d %H:%M:%s'
     row_n = df_merged.shape[0]
     train_num = int(row_n*train_ratio)
     pivot_val = df_merged_sorted.ix[train_num, 'md5_val']
@@ -42,11 +39,10 @@ def split_by_user_id(df_merged, train_ratio=0.67):
 
     df_merged_train = df_merged_sorted[df_merged_sorted['md5_val']<=pivot_val]
     df_merged_test = df_merged_sorted[df_merged_sorted['md5_val']>pivot_val]
-    df_merged_train.to_csv('./data/hive_sql_merged_instances_train.csv', sep='\t', index=0)
-    df_merged_test.to_csv('./data/hive_sql_merged_instances_test.csv', sep='\t', index=0)
+    # df_merged_train.to_csv('./data/hive_sql_merged_instances_train.csv', sep='\t', index=0)
+    # df_merged_test.to_csv('./data/hive_sql_merged_instances_test.csv', sep='\t', index=0)
 
     return df_merged_train, df_merged_test
-
 
 def merged_data_info(df_origin):
     pass
@@ -71,16 +67,19 @@ print('hello world')
 df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', parse_dates=[1],
     infer_datetime_format=True,
     sep='\t')
-df_merged['creation_date'] = pd.to_datetime(df_merged['creation_date'], 
-    format='%Y-%m-%d %H:%M:%S')
-df_merged['gap_days'] = (df_merged['creation_date'] - df_merged['creation_date']).dt.days
+# df_merged['creation_date'] = pd.to_datetime(df_merged['creation_date'], 
+#     format='%Y-%m-%d %H:%M:%S')
+# df_merged['gap_days'] = (df_merged['creation_date'] - df_merged['creation_date']).dt.days
 
 print('df_merged shape is ', df_merged.shape)
 print('df_merged dtypes is ', df_merged.dtypes)
-print('df_merged head is ', df_merged['gap_days'].head(10))
+# print('df_merged head is ', df_merged['gap_days'].head(10))
 
-# split_by_user_id(df_merged)
+split_by_user_id(df_merged)
 
+###----------------------------###
+###------ 加上R的feature  -----###
+###----------------------------###
 df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
 # df_recency = pd.read_csv('./data/hive_sql_R_data.csv')
 # df_recency['creation_date'] = pd.to_datetime(df_recency['creation_date'], 
@@ -88,13 +87,63 @@ df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer
 # df_recency['recency_date'] = pd.to_datetime(df_recency['recency_date'], 
 #     format='%Y-%m-%d %H:%M:%S', errors='ignore')
 df_recency['gap_days'] = (df_recency['creation_date'] - df_recency['recency_date']).dt.days
+df_merged = pd.merge(df_merged, df_recency, how='left', on=['buy_user_id', 'creation_date'])
+df_merged.drop(['recency_date'], axis=1, inplace=True)
+print('df_merged.shape after add R is ', df_merged.shape)
+print('df_merged.dtypes after add R is ', df_merged.dtypes)
+
+###----------------------------###
+###------ 加上F的feature  -----###
+###----------------------------###
+df_frequency = pd.read_csv('./data/hive_sql_F_data.csv', parse_dates=[1], infer_datetime_format=True)
+df_merged = pd.merge(df_merged, df_frequency, how='left', on=['buy_user_id', 'creation_date'])
+print('df_merged.shape after add frequency is ', df_merged.shape)
+print('df_merged.dtypes after add frequency is ', df_merged.dtypes)
+
+###----------------------------###
+###------ 加上M的feature  -----###
+###----------------------------###
+df_monetary = pd.read_csv('./data/hive_sql_M_data.csv', parse_dates=[1], infer_datetime_format=True)
+df_merged = pd.merge(df_merged, df_monetary, how='left', on=['buy_user_id', 'creation_date'])
+print('df_merged.shape after add monetary is ', df_merged.shape)
+print('df_merged.dtypes after add monetary is ', df_merged.dtypes)
 
 
-print('df_recency dtypes is ', df_recency.dtypes)
-print('df_recency sample is ', df_recency['creation_date'].tail(10))
+###----------------------------###
+###-- 加上first order的feature -###
+###----------------------------###
+df_first_order = pd.read_csv('./data/hive_sql_first_order_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
+df_first_order['gap_days_first_order'] = (df_first_order['creation_date'] - df_first_order['order_dt']).dt.days
+df_first_order.drop(['order_dt'], axis=1, inplace=True)
+df_merged = pd.merge(df_merged, df_first_order, how='left', on=['buy_user_id', 'creation_date'])
+print('df_merged.shape after add first order is ', df_merged.shape)
+print('df_merged.dtypes after add first order is ', df_merged.dtypes)
+
+
+###----------------------------###
+###-- 加上last order的feature -###
+###----------------------------###
+df_last_order = pd.read_csv('./data/hive_sql_last_order_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
+df_last_order['gap_days_last_order'] = (df_last_order['creation_date'] - df_last_order['order_dt']).dt.days
+df_last_order.drop(['order_dt'], axis=1, inplace=True)
+df_merged = pd.merge(df_merged, df_last_order, how='left', on=['buy_user_id', 'creation_date'])
+print('df_merged.shape after add last order is ', df_merged.shape)
+print('df_merged.dtypes after add last order is ', df_merged.dtypes)
+
+
+###----------------------------###
+###------ 加上地址的feature  ---###
+###----------------------------###
+df_address = pd.read_csv('./data/hive_sql_address_data.csv')
+df_address['rand_address_code'] = df_address['rand_address_code'].apply(str)
+df_merged = pd.merge(df_merged, df_address, how='left', on=['buy_user_id'])
+print('df_merged.shape after add address code is ', df_merged.shape)
+print('df_merged.dtypes after add address code is ', df_merged.dtypes)
+
 
 print('finished process!')
 
+split_by_user_id(df_merged)
 
 # train_df = merged_df[merged_df['prediction_pay_price']!=-99999]
 # train_y = train_df['prediction_pay_price'].values
@@ -112,10 +161,10 @@ print('finished process!')
 #       X_train_new.shape, X_val_new.shape, test_X.shape))
 
 
-#lgbm = lgb.LGBMRegressor(n_estimators=5000, n_jobs=-1, learning_rate=0.08, 
-#                          random_state=42, max_depth=13, min_child_samples=400,
-#                          num_leaves=700, subsample=0.7, colsample_bytree=0.85,
-#                          silent=-1, verbose=-1)
+lgbm = lgb.LGBMRegressor(n_estimators=500, n_jobs=-1, learning_rate=0.08, 
+                         random_state=42, max_depth=13, min_child_samples=400,
+                         num_leaves=700, subsample=0.7, colsample_bytree=0.85,
+                         silent=-1, verbose=-1)
 
 
 #lgbm = lgb.LGBMRegressor(n_estimators=5000, n_jobs=-1, learning_rate=0.05, 
