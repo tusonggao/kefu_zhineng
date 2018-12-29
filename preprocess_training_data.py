@@ -63,31 +63,35 @@ def merged_data_info(df_origin):
 # print('df_neg head is ', df_neg.head(3))
 
 print('hello world')
-df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', sep='\t')
-# df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', parse_dates=[1],
-#     infer_datetime_format=True,
-#     sep='\t')
+# df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', sep='\t')
+# df_merged.to_csv('./data/hive_sql_merged_instances_comma.csv', index=0)
+
+# df_merged = pd.read_csv('./data/hive_sql_merged_instances_comma.csv')
+
+df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', parse_dates=[1],
+    infer_datetime_format=True,
+    sep='\t')
 df_merged['creation_date'] = pd.to_datetime(df_merged['creation_date'], 
-    format='%Y-%m-%d %H:%M:%S', errors='ignore')
+    format='%Y-%m-%d %H:%M:%S')
+df_merged['gap_days'] = (df_merged['creation_date'] - df_merged['creation_date']).dt.days
+
 print('df_merged shape is ', df_merged.shape)
 print('df_merged dtypes is ', df_merged.dtypes)
-print('df_merged head is ', df_merged['creation_date'].head(10))
+print('df_merged head is ', df_merged['gap_days'].head(10))
 
 # split_by_user_id(df_merged)
 
-# df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
-df_recency = pd.read_csv('./data/hive_sql_R_data.csv')
-
-
-df_recency['creation_date'] = pd.to_datetime(df_recency['creation_date'], 
-    format='%Y-%m-%d %H:%M:%S', errors='ignore')
-df_recency['recency_date'] = pd.to_datetime(df_recency['recency_date'], 
-    format='%Y-%m-%d %H:%M:%S', errors='ignore')
+df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
+# df_recency = pd.read_csv('./data/hive_sql_R_data.csv')
+# df_recency['creation_date'] = pd.to_datetime(df_recency['creation_date'], 
+#     format='%Y-%m-%d %H:%M:%S', errors='ignore')
+# df_recency['recency_date'] = pd.to_datetime(df_recency['recency_date'], 
+#     format='%Y-%m-%d %H:%M:%S', errors='ignore')
 df_recency['gap_days'] = (df_recency['creation_date'] - df_recency['recency_date']).dt.days
 
 
 print('df_recency dtypes is ', df_recency.dtypes)
-print('df_recency sample is ', df_recency['gap_days'].tail(10))
+print('df_recency sample is ', df_recency['creation_date'].tail(10))
 
 print('finished process!')
 
