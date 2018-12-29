@@ -1,0 +1,8 @@
+/*  训练样例中所有buy_user_id收货地址的个数 */
+select a.buy_user_id, count(*)
+from jkbd.buy_user_contract_parquet a 
+where a.buy_user_id in
+(select distinct buy_user_id
+from bigdata_ai.merged_buyuser_tsg)
+and a.contract_type=4
+group by a.buy_user_id;

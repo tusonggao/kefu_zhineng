@@ -1,0 +1,10 @@
+/*  训练样例中所有buy_user_id收货地址的编号(有多个地址的话，只随机取其中的一个） */
+select t.buy_user_id buy_user_id, max(address_code) rand_address_code
+from(
+select a.buy_user_id buy_user_id, substr(a.acontract_info, 1, 2) address_code
+from jkbd.buy_user_contract_parquet a 
+where a.buy_user_id in(
+select distinct buy_user_id
+from bigdata_ai.merged_buyuser_tsg)
+and a.contract_type=4) t
+group by t.buy_user_id;

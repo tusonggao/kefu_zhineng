@@ -61,6 +61,12 @@ def read_and_store_df_from_impala(sql_file):
 # sql = 'show databases;'
 # sql = read_sql_script('./sql_scripts/hive_sql_5.txt')
 
+# end_t = time.time()
+# print('df.shape is', df.shape)
+# print('df.head() is', df.head())
+# print('read data cost time ', end_t-start_t)
+# df.to_csv('./data/hive_sql_1_output.csv', index=0)
+
 
 # './sql_scripts/hive_sql_pos_instances.txt')
 
@@ -68,18 +74,16 @@ def read_and_store_df_from_impala(sql_file):
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
 
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
-
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_R.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_F.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_M.txt')
 
-df = read_and_store_df_from_impala('./sql_scripts/hive_sql_last_order.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
 
-# end_t = time.time()
-# print('df.shape is', df.shape)
-# print('df.head() is', df.head())
-# print('read data cost time ', end_t-start_t)
-# df.to_csv('./data/hive_sql_1_output.csv', index=0)
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_last_order.txt')
+
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_address.txt')
+
+
