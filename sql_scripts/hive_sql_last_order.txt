@@ -1,0 +1,13 @@
+/*  训练样例中所有buy_user_id的距离当前时间最近一次购买订单时间和金额  */
+select buy_user_id, creation_date, order_dt, order_cost from
+(
+select b.buy_user_id buy_user_id, b.creation_date creation_date, a.order_cost/100.0 order_cost, a.creation_date order_dt, 
+row_number() over (partition by b.buy_user_id, b.creation_date order by a.creation_date desc) as rn
+from jkbd.orders_parquet a join 
+(select buy_user_id, creation_date
+from bigdata_ai.merged_buyuser_tsg
+group by buy_user_id, creation_date) b
+where a.buy_user_id=b.buy_user_id and date_add(a.creation_date, 1)<=to_date(b.creation_date)
+and a.order_status in (50, 150)
+) t where t.rn=1 
+order by t.creation_date;

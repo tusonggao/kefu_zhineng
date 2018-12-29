@@ -74,7 +74,9 @@ def read_and_store_df_from_impala(sql_file):
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_F.txt')
 
-df = read_and_store_df_from_impala('./sql_scripts/hive_sql_M.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_M.txt')
+
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_last_order.txt')
 
 # end_t = time.time()
 # print('df.shape is', df.shape)
