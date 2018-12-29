@@ -18,6 +18,9 @@ from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
 
+def convert_2_md5(value):
+    return hashlib.md5(str(value).encode('utf-8')).hexdigest()
+
 train_df = merged_df[merged_df['prediction_pay_price']!=-99999]
 train_y = train_df['prediction_pay_price'].values
 train_X = train_df.drop(['prediction_pay_price'], axis=1).values

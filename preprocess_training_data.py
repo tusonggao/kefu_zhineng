@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-import xgboost as xgb
+# import xgboost as xgb
 import lightgbm as lgb
 
 from sklearn.metrics import accuracy_score
@@ -19,6 +19,21 @@ from sklearn.model_selection import train_test_split
 
 random_seed = 42
 np.random.seed(random_seed)
+
+def convert_2_md5(value):
+    return hashlib.md5(str(value).encode('utf-8')).hexdigest()
+
+def split_by_user_id(df_merged, train_ratio=0.7):
+    df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
+
+    df_merged_sorted = df_merged.sort_values(by=['md5_val'])
+    print('df_merged_sorted head is ', df_merged_sorted.head(5))
+    df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', index=0)
+    row_n = df_merged.shape[0]
+    train_num = int(row_n*train_ratio)
+    
+
+    return df_merged_train, df_merged_test
 
 # df_pos = pd.read_csv('./data/hive_sql_pos_instances_data.csv')
 # df_neg = pd.read_csv('./data/hive_sql_neg_instances_data_modified.csv')
@@ -32,29 +47,30 @@ np.random.seed(random_seed)
 # print('df_neg head is ', df_neg.head(3))
 
 df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', sep='\t')
-
-
-
 print('df_merged is ', df_merged.shape)
-print('df_merged sample is ', df_merged.sample(10))
+print('df_merged sample is ', df_merged.sample(20))
 
-df_merged[['buy_user_id', 'creation_date', 'y']].to_csv('./data/hive_sql_merged_instances.csv', sep='\t', index=0)
+df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
+
+df_merged_sorted = df_merged.sort_values(by=['md5_val'])
+print('df_merged_sorted head is ', df_merged_sorted.head(5))
+df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', index=0)
 
 
-train_df = merged_df[merged_df['prediction_pay_price']!=-99999]
-train_y = train_df['prediction_pay_price'].values
-train_X = train_df.drop(['prediction_pay_price'], axis=1).values
+# train_df = merged_df[merged_df['prediction_pay_price']!=-99999]
+# train_y = train_df['prediction_pay_price'].values
+# train_X = train_df.drop(['prediction_pay_price'], axis=1).values
 
-test_df = merged_df[merged_df['prediction_pay_price']==-99999]
-test_X = test_df.drop(['prediction_pay_price'], axis=1).values
+# test_df = merged_df[merged_df['prediction_pay_price']==-99999]
+# test_X = test_df.drop(['prediction_pay_price'], axis=1).values
 
 #del merged_df, train_df, test_df
 #gc.collect()
 
-X_train_new, X_val_new, y_train_new, y_val_new = train_test_split(train_X, 
-            train_y, test_size=0.25, random_state=42)
-print('X_train_new.shape is {}, X_val_new.shape is {}, test_X.shape is {}'.format(
-      X_train_new.shape, X_val_new.shape, test_X.shape))
+# X_train_new, X_val_new, y_train_new, y_val_new = train_test_split(train_X, 
+#             train_y, test_size=0.25, random_state=42)
+# print('X_train_new.shape is {}, X_val_new.shape is {}, test_X.shape is {}'.format(
+#       X_train_new.shape, X_val_new.shape, test_X.shape))
 
 
 #lgbm = lgb.LGBMRegressor(n_estimators=5000, n_jobs=-1, learning_rate=0.08, 
