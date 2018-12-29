@@ -17,39 +17,6 @@ from sklearn.metrics import mean_squared_error
 
 from sklearn.model_selection import train_test_split
 
-def convert_2_md5(value):
-    return hashlib.md5(str(value).encode('utf-8')).hexdigest()
-
-def write_to_log(*param):
-    param_list = [str(s) for s in param]
-    log = ' '.join(param_list)
-    with open('./outcome/log_file.txt', 'a') as file:
-        file.write(log+'\n')
-        file.flush()  #立即写入磁盘
-        os.fsync(file)  #立即写入磁盘
-
-# RMSE(root-mean-square error)
-# self-defined eval metric
-# f(y_true: array, y_pred: array) -> name: string, eval_result: float, is_higher_better: bool
-# Root Mean Squared Logarithmic Error (RMSLE)
-def rmse(y_true, y_pred):
-    y_pred = np.where(y_pred>0, y_pred, 0)
-    return 'RMSE', np.sqrt(mean_squared_error(y_true, y_pred)), False
-
-def rmse_new(y_true, y_pred):
-    if np.sum(y_pred<0)>0:
-        print('negative exits.', np.sum(y_pred<0))
-    else:
-        print('negative not exits.')
-    y_pred = np.where(y_pred>0, y_pred, 0)
-    return 'RMSE', np.sqrt(mean_squared_error(y_true, y_pred)), False
-
-#print('prog starting, hello world!')
-start_t = time.time()
-merged_df = pd.read_csv('C:/D_Disk/data_competition/gamer_value/data/merged_df.csv', 
-                       index_col=0, header=0)
-print('merged_df.shape is {} load data cost time:{}'.format(
-        merged_df.shape, time.time()-start_t))
 
 train_df = merged_df[merged_df['prediction_pay_price']!=-99999]
 train_y = train_df['prediction_pay_price'].values
