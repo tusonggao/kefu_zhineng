@@ -86,11 +86,14 @@ df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer
 #     format='%Y-%m-%d %H:%M:%S', errors='ignore')
 # df_recency['recency_date'] = pd.to_datetime(df_recency['recency_date'], 
 #     format='%Y-%m-%d %H:%M:%S', errors='ignore')
-df_recency['gap_days'] = (df_recency['creation_date'] - df_recency['recency_date']).dt.days
-df_merged = pd.merge(df_merged, df_recency, how='left', on=['buy_user_id', 'creation_date'])
-df_merged.drop(['recency_date'], axis=1, inplace=True)
-print('df_merged.shape after add R is ', df_merged.shape)
-print('df_merged.dtypes after add R is ', df_merged.dtypes)
+
+# df_recency['gap_days'] = (df_recency['creation_date'] - df_recency['recency_date']).dt.days
+# df_merged = pd.merge(df_merged, df_recency, how='left', on=['buy_user_id', 'creation_date'])
+# df_merged.drop(['recency_date'], axis=1, inplace=True)
+# print('df_merged.shape after add R is ', df_merged.shape)
+# print('df_merged.dtypes after add R is ', df_merged.dtypes)
+
+# df_merged.drop(['gap_days'], axis=1, inplace=True)
 
 ###----------------------------###
 ###------ 加上F的feature  -----###
@@ -140,52 +143,53 @@ df_merged = pd.merge(df_merged, df_address, how='left', on=['buy_user_id'])
 print('df_merged.shape after add address code is ', df_merged.shape)
 print('df_merged.dtypes after add address code is ', df_merged.dtypes)
 
-
-print('finished process!')
-
-split_by_user_id(df_merged)
-
-# train_df = merged_df[merged_df['prediction_pay_price']!=-99999]
-# train_y = train_df['prediction_pay_price'].values
-# train_X = train_df.drop(['prediction_pay_price'], axis=1).values
-
-# test_df = merged_df[merged_df['prediction_pay_price']==-99999]
-# test_X = test_df.drop(['prediction_pay_price'], axis=1).values
-
-#del merged_df, train_df, test_df
-#gc.collect()
-
-# X_train_new, X_val_new, y_train_new, y_val_new = train_test_split(train_X, 
-#             train_y, test_size=0.25, random_state=42)
-# print('X_train_new.shape is {}, X_val_new.shape is {}, test_X.shape is {}'.format(
-#       X_train_new.shape, X_val_new.shape, test_X.shape))
+print('\n-------------------------------------\n'
+      '     data preprocess finished          \n'
+      '---------------------------------------\n');
 
 
-lgbm = lgb.LGBMRegressor(n_estimators=500, n_jobs=-1, learning_rate=0.08, 
+# df_merged = pd.get_dummies(df_merged)
+
+df_merged_train, df_merged_test = split_by_user_id(df_merged)
+df_merged_train.drop(['buy_user_id', 'creation_date', 'md5_val'], axis=1, inplace=True)
+df_merged_test.drop(['buy_user_id', 'creation_date', 'md5_val'], axis=1, inplace=True)
+
+print('df_merged_train.shape df_merged_test.shape: ', df_merged_train.shape, df_merged_test.shape)
+
+df_merged_train = pd.get_dummies(df_merged_train)
+df_merged_test = pd.get_dummies(df_merged_test)
+
+df_train_y = df_merged_train['y']
+df_train_X = df_merged_train.drop(['y'], axis=1)
+
+df_test_y = df_merged_test['y']
+df_test_X = df_merged_test.drop(['y'], axis=1)
+
+print('start training')
+start_t = time.time()
+
+lgbm = lgb.LGBMClassifier(n_estimators=500, n_jobs=-1, learning_rate=0.08, 
                          random_state=42, max_depth=13, min_child_samples=400,
-                         num_leaves=700, subsample=0.7, colsample_bytree=0.85,
+                         num_leaves=100, subsample=0.7, colsample_bytree=0.85,
                          silent=-1, verbose=-1)
 
+# lgbm.fit(X_train_new, y_train_new, eval_set=[(X_val_new, y_val_new)], 
+#         eval_metric='auc', verbose=200, early_stopping_rounds=600)
 
-#lgbm = lgb.LGBMRegressor(n_estimators=5000, n_jobs=-1, learning_rate=0.05, 
-#                          random_state=42, max_depth=7, min_child_samples=150,
-#                          num_leaves=3000, subsample=0.7, colsample_bytree=0.8,
-#                          silent=-1, verbose=-1)
+lgbm.fit(df_train_X, df_train_y)
+print('training ends, cost time: ', time.time()-start_t)
 
-#lgbm = lgb.LGBMRegressor(n_estimators=6000, n_jobs=-1, learning_rate=0.08, 
-#                          random_state=42, max_depth=13, min_child_samples=800,
-#                          num_leaves=151, subsample=0.8, colsample_bytree=0.9,
-#                          boosting_type='dart', reg_alpha=0.1, reg_lambda=0.05,
-#                          silent=-1, verbose=-1)
+start_t = time.time()
+print('predict starting')
+y_predictions = lgbm.predict_proba(df_test_X)
+auc_score = roc_auc_score(df_test_y, y_predictions[:, 1])
 
-#lgbm.fit(X_train_new, y_train_new, eval_set=[(X_val_new, y_val_new)], 
-#         eval_metric=rmse, verbose=200, early_stopping_rounds=600)
+print('auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
 
-#lgbm.fit(train_X, train_y, eval_set=[(X_train_new, y_train_new), 
-#        (X_val_new, y_val_new)], eval_metric=rmse, 
-#        verbose=200, early_stopping_rounds=500)
-    
-#lgbm.fit(X_train_new, y_train_new)
+# y_pred_proba = clf.predict_proba(df_test)
+# auc = roc_auc_score(y_test, y_pred_proba[:, 1])
+
+
 
 
 
