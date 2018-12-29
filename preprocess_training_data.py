@@ -31,7 +31,14 @@ def split_by_user_id(df_merged, train_ratio=0.7):
     df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', index=0)
     row_n = df_merged.shape[0]
     train_num = int(row_n*train_ratio)
-    
+    pivot_val = df_merged_sorted.iloc[train_num, 'md5_val']
+    print('train_num is: ', train_num, 'pivot_val is: ', pivot_val)
+
+    df_merged_train = df_merged_sorted[df_merged_sorted['md5_val']>=pivot_val]
+    df_merged_test = df_merged_sorted[df_merged_sorted['md5_val']<pivot_val]
+    df_merged_train.to_csv('./data/hive_sql_merged_instances_train.csv', sep='\t', index=0)
+    df_merged_test.to_csv('./data/hive_sql_merged_instances_test.csv', sep='\t', index=0)
+
 
     return df_merged_train, df_merged_test
 
@@ -49,6 +56,8 @@ def split_by_user_id(df_merged, train_ratio=0.7):
 df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', sep='\t')
 print('df_merged is ', df_merged.shape)
 print('df_merged sample is ', df_merged.sample(20))
+
+split_by_user_id(df_merged)
 
 df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
 
