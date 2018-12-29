@@ -17,30 +17,39 @@ from sklearn.metrics import mean_squared_error
 
 from sklearn.model_selection import train_test_split
 
+
 random_seed = 42
 np.random.seed(random_seed)
+
 
 def convert_2_md5(value):
     return hashlib.md5(str(value).encode('utf-8')).hexdigest()
 
-def split_by_user_id(df_merged, train_ratio=0.7):
+
+def split_by_user_id(df_merged, train_ratio=0.67):
     df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
 
+    print('df_merged.dtypes is ', df_merged.dtypes)
+
     df_merged_sorted = df_merged.sort_values(by=['md5_val'])
-    print('df_merged_sorted head is ', df_merged_sorted.head(5))
-    df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', index=0)
+    # print('df_merged_sorted head is ', df_merged_sorted.head(5))
+    df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', date_format='%Y/%m/%d', index=0)  # date_format='%Y-%m-%d %H:%M:%s'
     row_n = df_merged.shape[0]
     train_num = int(row_n*train_ratio)
-    pivot_val = df_merged_sorted.iloc[train_num, 'md5_val']
-    print('train_num is: ', train_num, 'pivot_val is: ', pivot_val)
+    pivot_val = df_merged_sorted.ix[train_num, 'md5_val']
+    pivot_val = 'ac3a1976ceca523950645655fd18a927'
+    # print('train_num is: ', train_num, 'pivot_val is: ', pivot_val)
 
-    df_merged_train = df_merged_sorted[df_merged_sorted['md5_val']>=pivot_val]
-    df_merged_test = df_merged_sorted[df_merged_sorted['md5_val']<pivot_val]
+    df_merged_train = df_merged_sorted[df_merged_sorted['md5_val']<=pivot_val]
+    df_merged_test = df_merged_sorted[df_merged_sorted['md5_val']>pivot_val]
     df_merged_train.to_csv('./data/hive_sql_merged_instances_train.csv', sep='\t', index=0)
     df_merged_test.to_csv('./data/hive_sql_merged_instances_test.csv', sep='\t', index=0)
 
-
     return df_merged_train, df_merged_test
+
+
+def merged_data_info(df_origin):
+    pass
 
 # df_pos = pd.read_csv('./data/hive_sql_pos_instances_data.csv')
 # df_neg = pd.read_csv('./data/hive_sql_neg_instances_data_modified.csv')
@@ -53,17 +62,22 @@ def split_by_user_id(df_merged, train_ratio=0.7):
 # print('df_neg is ', df_neg.shape)
 # print('df_neg head is ', df_neg.head(3))
 
+print('hello world')
+# df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', parse_dates=[1], sep='\t')
 df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', sep='\t')
+df_merged['creation_date'] = pd.to_datetime(df_merged['creation_date'], 
+    format='%Y-%m-%d %H:%M:%S', errors='ignore')
 print('df_merged is ', df_merged.shape)
-print('df_merged sample is ', df_merged.sample(20))
+print('df_merged sample is ', df_merged.sample(10))
 
-split_by_user_id(df_merged)
+# split_by_user_id(df_merged)
 
-df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
+df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
 
-df_merged_sorted = df_merged.sort_values(by=['md5_val'])
-print('df_merged_sorted head is ', df_merged_sorted.head(5))
-df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', sep='\t', index=0)
+print('df_recency is ', df_recency.shape)
+print('df_recency sample is ', df_recency['creation_date'].head(10))
+
+print('finished process!')
 
 
 # train_df = merged_df[merged_df['prediction_pay_price']!=-99999]
