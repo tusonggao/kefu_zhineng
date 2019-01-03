@@ -154,6 +154,16 @@ df_merged = pd.merge(df_merged, df_class_code, how='left', on=['buy_user_id'])
 print('df_merged.shape after add class_code, branch_code code is ', df_merged.shape)
 print('df_merged.dtypes after add class_code, branch_code code is ', df_merged.dtypes)
 
+
+###----------------------------------------------------------###
+###------ 加上start_app count的feature -----------------------###
+###----------------------------------------------------------###
+df_start_app_cnt = pd.read_csv('./data/hive_sql_startapp_cnt_data.csv')
+df_start_app_cnt.rename(columns={'cnt':'start_app_cnt'}, inplace = True)
+df_merged = pd.merge(df_merged, df_start_app_cnt, how='left', on=['buy_user_id', 'creation_date'])
+print('df_merged.shape after add start_app count, branch_code code is ', df_merged.shape)
+print('df_merged.dtypes after add start_app count, branch_code code is ', df_merged.dtypes)
+
 print('\n-------------------------------------\n'
       '     data preprocess finished          \n'
       '---------------------------------------\n');

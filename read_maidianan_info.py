@@ -31,6 +31,8 @@ print(sql)
 
 df = pd.read_csv('./data/df_maidian_info.csv', index_col=0)
 
+df.to_csv('./data/df_maidian_info_noindex.csv', index=0, sep='\t')
+
 df_new = df.pivot(index='date', columns='account_id', values='cnt')
 
 print('df.head is ', df.head(5))
