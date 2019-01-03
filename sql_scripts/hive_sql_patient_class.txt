@@ -1,4 +1,4 @@
-/*  训练样例中所有buy_user_id对应的class_code与branch_code */
+/*  训练样例中所有buy_user_id对应的class_code与branch_code（可能会有信息泄露） */
 select a.buy_user_id buy_user_id, b.class_code class_code, b.branch_code branch_code
 from 
 (select buy_user_id from bigdata_ai.merged_buyuser_tsg group by buy_user_id) a

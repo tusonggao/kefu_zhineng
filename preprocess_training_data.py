@@ -143,12 +143,26 @@ df_merged = pd.merge(df_merged, df_address, how='left', on=['buy_user_id'])
 print('df_merged.shape after add address code is ', df_merged.shape)
 print('df_merged.dtypes after add address code is ', df_merged.dtypes)
 
+
+###----------------------------------------------------------###
+###------ 加上class_code 和 branch_code的feature -------------###
+###----------------------------------------------------------###
+df_class_code = pd.read_csv('./data/hive_sql_patient_class_data.csv')
+df_class_code['class_code'] = df_class_code['class_code'].apply(str)
+df_class_code['branch_code'] = df_class_code['branch_code'].apply(str)
+df_merged = pd.merge(df_merged, df_class_code, how='left', on=['buy_user_id'])
+print('df_merged.shape after add class_code, branch_code code is ', df_merged.shape)
+print('df_merged.dtypes after add class_code, branch_code code is ', df_merged.dtypes)
+
 print('\n-------------------------------------\n'
       '     data preprocess finished          \n'
       '---------------------------------------\n');
 
-
 # df_merged = pd.get_dummies(df_merged)
+
+
+df_merged = pd.get_dummies(df_merged, columns=['rand_address_code', 'class_code', 'branch_code'])
+print('afte get_dummies, df_merged.shape is ', df_merged.shape)
 
 df_merged_train, df_merged_test = split_by_user_id(df_merged)
 df_merged_train.drop(['buy_user_id', 'creation_date', 'md5_val'], axis=1, inplace=True)
@@ -156,8 +170,8 @@ df_merged_test.drop(['buy_user_id', 'creation_date', 'md5_val'], axis=1, inplace
 
 print('df_merged_train.shape df_merged_test.shape: ', df_merged_train.shape, df_merged_test.shape)
 
-df_merged_train = pd.get_dummies(df_merged_train)
-df_merged_test = pd.get_dummies(df_merged_test)
+# df_merged_train = pd.get_dummies(df_merged_train)
+# df_merged_test = pd.get_dummies(df_merged_test)
 
 df_train_y = df_merged_train['y']
 df_train_X = df_merged_train.drop(['y'], axis=1)
