@@ -47,6 +47,19 @@ def split_by_user_id(df_merged, train_ratio=0.67):
 def merged_data_info(df_origin):
     pass
 
+
+def compute_top_multiple(label_y, predict_y):
+    df = pd.DataFrame()
+    df['label_y'] = label_y
+    df['predict_y'] = predict_y
+    df.sort_values(by=['predict_y'], ascending=False, inplace=True)
+    df_top_10_percent = df[:int(0.1*df.shape[0])]
+    ratio = sum(df['label_y'])/df.shape[0]
+    ratio_top_10_percent = sum(df_top_10_percent['label_y'])/df_top_10_percent.shape[0]
+    ratio_mutiple = ratio_top_10_percent/ratio
+    return ratio_mutiple
+
+
 # df_pos = pd.read_csv('./data/hive_sql_pos_instances_data.csv')
 # df_neg = pd.read_csv('./data/hive_sql_neg_instances_data_modified.csv')
 # df_neg = df_neg.sample(n=600000)
@@ -207,8 +220,10 @@ start_t = time.time()
 print('predict starting')
 y_predictions = lgbm.predict_proba(df_test_X)
 auc_score = roc_auc_score(df_test_y, y_predictions[:, 1])
+ratio_multiple = compute_top_multiple(df_test_y, y_predictions[:, 1])
 
 print('auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
+print('ratio_multiple is ', ratio_multiple)
 
 # y_pred_proba = clf.predict_proba(df_test)
 # auc = roc_auc_score(y_test, y_pred_proba[:, 1])
