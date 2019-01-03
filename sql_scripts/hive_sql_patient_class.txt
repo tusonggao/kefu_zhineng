@@ -1,0 +1,8 @@
+/*  训练样例中所有buy_user_id对应的class_code与branch_code */
+select a.buy_user_id buy_user_id, b.class_code class_code, b.branch_code branch_code
+from 
+(select buy_user_id from bigdata_ai.merged_buyuser_tsg group by buy_user_id) a
+join
+(select buy_user_id, max(class_code) class_code, max(branch_code) branch_code
+from jkbd.buy_user_product_class_parquet group by buy_user_id) b
+where a.buy_user_id=b.buy_user_id;
