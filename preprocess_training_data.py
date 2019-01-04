@@ -247,6 +247,8 @@ auc_score = roc_auc_score(df_test_y, y_predictions[:, 1])
 print('auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
 print('top 200 ratio_multiple is',
       compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=200, by_percentage=False), 
+      'top 500 ratio_multiple is',
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=500, by_percentage=False), 
       'ratio_multiple top 1 is ', 
       compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=1), 
       'ratio_multiple top 5 is ', 
@@ -284,18 +286,27 @@ print('top 200 ratio_multiple is',
 
 
 feature_names = df_train_X.columns.values.tolist()
-
-# print(pd.DataFrame({
-#         'column': feature_names,
-#         'importance': lgbm.feature_importances_,
-#     }).sort_values(by='importance', ascending=False))
-
 df_feat_importance = pd.DataFrame({
         'column': feature_names,
         'importance': lgbm.feature_importances_,
     }).sort_values(by='importance', ascending=False)
 df_feat_importance.to_csv('./model_output/df_feat_importance.csv', index=0, sep='\t')
 
+# df_feat_importance[:22].plot.bar(x='column', y='importance', rot=0)
+# plt.show()
+
+def show_features_importance_bar(features, feature_importance):
+    plt.figure(figsize=(16, 6))
+    plt.yscale('log', nonposy='clip')
+    plt.bar(range(len(feature_importance)), feature_importance, align='center')
+    plt.xticks(range(len(feature_importance)), features, rotation='vertical')
+    plt.title('Feature importance')
+    plt.ylabel('Importance')
+    plt.xlabel('Features')
+    plt.show()
+
+
+show_features_importance_bar(feature_names[:22], lgbm.feature_importances_[:22])
 
 lgbm = lgb.LGBMClassifier(n_estimators=1000, n_jobs=-1, learning_rate=0.08, 
                          random_state=42, max_depth=7, min_child_samples=500,
@@ -314,6 +325,8 @@ auc_score = roc_auc_score(df_test_y, y_predictions[:, 1])
 print('new auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
 print('top 200 ratio_multiple is',
       compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=200, by_percentage=False), 
+      'top 500 ratio_multiple is',
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=500, by_percentage=False), 
       'ratio_multiple top 1 is ', 
       compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=1), 
       'ratio_multiple top 5 is ', 
