@@ -48,15 +48,33 @@ def merged_data_info(df_origin):
     pass
 
 
-def compute_top_multiple(label_y, predict_y, top_ratio=0.1):
+def compute_top_multiple(label_y, predict_y, threshold=10, by_percentage=True):
     df = pd.DataFrame()
     df['label_y'] = label_y
     df['predict_y'] = predict_y
     df.sort_values(by=['predict_y'], ascending=False, inplace=True)
-    df_top_10_percent = df[:int(top_ratio*df.shape[0])]
-    ratio = sum(df['label_y'])/df.shape[0]
-    ratio_top_10_percent = sum(df_top_10_percent['label_y'])/df_top_10_percent.shape[0]
-    ratio_mutiple = ratio_top_10_percent/ratio
+    ratio_whole = sum(df['label_y'])/df.shape[0]
+    if by_percentage:        
+        df_top = df[:int(threshold*0.01*df.shape[0])]
+    else:
+        df_top = df[:threshold]        
+    ratio_top = sum(df_top['label_y'])/df_top.shape[0]
+    ratio_mutiple = ratio_top/ratio_whole
+    return ratio_mutiple
+
+
+def compute_bottom_multiple(label_y, predict_y, threshold=10, by_percentage=True):
+    df = pd.DataFrame()
+    df['label_y'] = label_y
+    df['predict_y'] = predict_y
+    df.sort_values(by=['predict_y'], ascending=False, inplace=True)
+    ratio_whole = sum(df['label_y'])/df.shape[0]
+    if by_percentage:        
+        df_bottom = df[-int(threshold*0.01*df.shape[0]):]
+    else:
+        df_bottom = df[-threshold:]        
+    ratio_bottom = sum(df_bottom['label_y'])/df_bottom.shape[0]
+    ratio_mutiple = ratio_bottom/ratio_whole
     return ratio_mutiple
 
 
@@ -227,13 +245,39 @@ auc_score = roc_auc_score(df_test_y, y_predictions[:, 1])
 
 
 print('auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
-
-ratio_multiple_10 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.1)
-ratio_multiple_20 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.2)
-ratio_multiple_30 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.3)
-
-print('ratio_multiple 10 is ', ratio_multiple_10, 
-      'ratio_multiple 20 is ', ratio_multiple_20)
+print('top 200 ratio_multiple is',
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=200, by_percentage=False), 
+      'ratio_multiple top 1 is ', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=1), 
+      'ratio_multiple top 5 is ', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=5), 
+      'ratio_multiple top 10 is ', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=10), 
+      'ratio_multiple top 20 is ',
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=20),
+      'ratio_multiple top 30 is', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=30),
+      'ratio_multiple top 40 is', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=40),
+      'ratio_multiple top 50 is', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=50),
+      'bottom 200 ratio_multiple is',
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=200, by_percentage=False), 
+      'ratio_multiple bottom 1 is ', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=1), 
+      'ratio_multiple bottom 5 is ', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=5), 
+      'ratio_multiple bottom 10 is ', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=10), 
+      'ratio_multiple bottom 20 is ',
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=20),
+      'ratio_multiple bottom 30 is', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=30),
+      'ratio_multiple bottom 40 is', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=40),
+      'ratio_multiple bottom 50 is', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=50),
+      )
 
 # y_pred_proba = clf.predict_proba(df_test)
 # auc = roc_auc_score(y_test, y_pred_proba[:, 1])
@@ -253,11 +297,53 @@ df_feat_importance = pd.DataFrame({
 df_feat_importance.to_csv('./model_output/df_feat_importance.csv', index=0, sep='\t')
 
 
-# print(pd.DataFrame({
-#         'column': feature_names,
-#         'importance': lgbm.feature_importance(),
-#     }).sort_values(by='importance'))
+lgbm = lgb.LGBMClassifier(n_estimators=1000, n_jobs=-1, learning_rate=0.08, 
+                         random_state=42, max_depth=7, min_child_samples=500,
+                         num_leaves=55, subsample=0.7, colsample_bytree=0.85,
+                         silent=-1, verbose=-1)
 
-# gbdt.feature_importances_
+# lgbm.fit(X_train_new, y_train_new, eval_set=[(X_val_new, y_val_new)], 
+#         eval_metric='auc', verbose=200, early_stopping_rounds=600)
+
+lgbm.fit(df_train_X, df_train_y)
+print('new training ends, cost time: ', time.time()-start_t)
+start_t = time.time()
+y_predictions = lgbm.predict_proba(df_test_X)
+auc_score = roc_auc_score(df_test_y, y_predictions[:, 1])
+
+print('new auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
+print('top 200 ratio_multiple is',
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=200, by_percentage=False), 
+      'ratio_multiple top 1 is ', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=1), 
+      'ratio_multiple top 5 is ', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=5), 
+      'ratio_multiple top 10 is ', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=10), 
+      'ratio_multiple top 20 is ',
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=20),
+      'ratio_multiple top 30 is', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=30),
+      'ratio_multiple top 40 is', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=40),
+      'ratio_multiple top 50 is', 
+      compute_top_multiple(df_test_y, y_predictions[:, 1], threshold=50),
+      'bottom 200 ratio_multiple is',
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=200, by_percentage=False), 
+      'ratio_multiple bottom 1 is ', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=1), 
+      'ratio_multiple bottom 5 is ', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=5), 
+      'ratio_multiple bottom 10 is ', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=10), 
+      'ratio_multiple bottom 20 is ',
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=20),
+      'ratio_multiple bottom 30 is', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=30),
+      'ratio_multiple bottom 40 is', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=40),
+      'ratio_multiple bottom 50 is', 
+      compute_bottom_multiple(df_test_y, y_predictions[:, 1], threshold=50),
+      )
 
 print('program ends')
