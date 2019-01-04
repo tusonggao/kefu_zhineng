@@ -230,6 +230,7 @@ print('auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
 
 ratio_multiple_10 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.1)
 ratio_multiple_20 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.2)
+ratio_multiple_30 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.3)
 
 print('ratio_multiple 10 is ', ratio_multiple_10, 
       'ratio_multiple 20 is ', ratio_multiple_20)
