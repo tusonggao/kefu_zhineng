@@ -48,12 +48,12 @@ def merged_data_info(df_origin):
     pass
 
 
-def compute_top_multiple(label_y, predict_y):
+def compute_top_multiple(label_y, predict_y, top_ratio=0.1):
     df = pd.DataFrame()
     df['label_y'] = label_y
     df['predict_y'] = predict_y
     df.sort_values(by=['predict_y'], ascending=False, inplace=True)
-    df_top_10_percent = df[:int(0.1*df.shape[0])]
+    df_top_10_percent = df[:int(top_ratio*df.shape[0])]
     ratio = sum(df['label_y'])/df.shape[0]
     ratio_top_10_percent = sum(df_top_10_percent['label_y'])/df_top_10_percent.shape[0]
     ratio_mutiple = ratio_top_10_percent/ratio
@@ -88,7 +88,7 @@ print('df_merged shape is ', df_merged.shape)
 print('df_merged dtypes is ', df_merged.dtypes)
 # print('df_merged head is ', df_merged['gap_days'].head(10))
 
-split_by_user_id(df_merged)
+# split_by_user_id(df_merged)
 
 ###----------------------------###
 ###------ 加上R的feature  -----###
@@ -151,7 +151,8 @@ print('df_merged.dtypes after add last order is ', df_merged.dtypes)
 ###------ 加上地址的feature  ---###
 ###----------------------------###
 df_address = pd.read_csv('./data/hive_sql_address_data.csv')
-df_address['rand_address_code'] = df_address['rand_address_code'].apply(str)
+df_address['address_code'] = df_address['rand_address_code'].apply(str)
+df_address.drop(['rand_address_code'], axis=1, inplace=True)
 df_merged = pd.merge(df_merged, df_address, how='left', on=['buy_user_id'])
 print('df_merged.shape after add address code is ', df_merged.shape)
 print('df_merged.dtypes after add address code is ', df_merged.dtypes)
@@ -182,9 +183,10 @@ print('\n-------------------------------------\n'
       '---------------------------------------\n');
 
 # df_merged = pd.get_dummies(df_merged)
+#为了加快训练速度，进行采样
+# df_merged = df_merged.sample(100000) 
 
-
-df_merged = pd.get_dummies(df_merged, columns=['rand_address_code', 'class_code', 'branch_code'])
+df_merged = pd.get_dummies(df_merged, columns=['address_code', 'class_code', 'branch_code'])
 print('afte get_dummies, df_merged.shape is ', df_merged.shape)
 
 df_merged_train, df_merged_test = split_by_user_id(df_merged)
@@ -201,6 +203,7 @@ df_train_X = df_merged_train.drop(['y'], axis=1)
 
 df_test_y = df_merged_test['y']
 df_test_X = df_merged_test.drop(['y'], axis=1)
+
 
 print('start training')
 start_t = time.time()
@@ -220,15 +223,40 @@ start_t = time.time()
 print('predict starting')
 y_predictions = lgbm.predict_proba(df_test_X)
 auc_score = roc_auc_score(df_test_y, y_predictions[:, 1])
-ratio_multiple = compute_top_multiple(df_test_y, y_predictions[:, 1])
+
+
 
 print('auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
-print('ratio_multiple is ', ratio_multiple)
+
+ratio_multiple_10 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.1)
+ratio_multiple_20 = compute_top_multiple(df_test_y, y_predictions[:, 1], top_ratio=0.2)
+
+print('ratio_multiple 10 is ', ratio_multiple_10, 
+      'ratio_multiple 20 is ', ratio_multiple_20)
 
 # y_pred_proba = clf.predict_proba(df_test)
 # auc = roc_auc_score(y_test, y_pred_proba[:, 1])
 
 
+feature_names = df_train_X.columns.values.tolist()
+
+# print(pd.DataFrame({
+#         'column': feature_names,
+#         'importance': lgbm.feature_importances_,
+#     }).sort_values(by='importance', ascending=False))
+
+df_feat_importance = pd.DataFrame({
+        'column': feature_names,
+        'importance': lgbm.feature_importances_,
+    }).sort_values(by='importance', ascending=False)
+df_feat_importance.to_csv('./model_output/df_feat_importance.csv', index=0, sep='\t')
 
 
+# print(pd.DataFrame({
+#         'column': feature_names,
+#         'importance': lgbm.feature_importance(),
+#     }).sort_values(by='importance'))
 
+# gbdt.feature_importances_
+
+print('program ends')
