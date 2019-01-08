@@ -1,9 +1,10 @@
+# https://datawhatnow.com/feature-importance/
+
 import pickle
 import time
 import gc
 import os
 import hashlib
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -168,9 +169,10 @@ print('df_merged.dtypes after add last order is ', df_merged.dtypes)
 ###----------------------------###
 ###------ 加上地址的feature  ---###
 ###----------------------------###
-df_address = pd.read_csv('./data/hive_sql_address_data.csv')
-df_address['address_code'] = df_address['rand_address_code'].apply(str)
-df_address.drop(['rand_address_code'], axis=1, inplace=True)
+df_address = pd.read_csv('./data/hive_sql_address_data.csv', dtype={'rand_address_code': str})
+df_address.rename(columns={'rand_address_code':'address_code'}, inplace = True)
+# df_address['address_code'] = df_address['rand_address_code'].apply(str)
+# df_address.drop(['rand_address_code'], axis=1, inplace=True)
 df_merged = pd.merge(df_merged, df_address, how='left', on=['buy_user_id'])
 print('df_merged.shape after add address code is ', df_merged.shape)
 print('df_merged.dtypes after add address code is ', df_merged.dtypes)
@@ -179,9 +181,10 @@ print('df_merged.dtypes after add address code is ', df_merged.dtypes)
 ###----------------------------------------------------------###
 ###------ 加上class_code 和 branch_code的feature -------------###
 ###----------------------------------------------------------###
-df_class_code = pd.read_csv('./data/hive_sql_patient_class_data.csv')
-df_class_code['class_code'] = df_class_code['class_code'].apply(str)
-df_class_code['branch_code'] = df_class_code['branch_code'].apply(str)
+df_class_code = pd.read_csv('./data/hive_sql_patient_class_data.csv', 
+                            dtype={'class_code': str, 'branch_code': str})
+# df_class_code['class_code'] = df_class_code['class_code'].apply(str)
+# df_class_code['branch_code'] = df_class_code['branch_code'].apply(str)
 df_merged = pd.merge(df_merged, df_class_code, how='left', on=['buy_user_id'])
 print('df_merged.shape after add class_code, branch_code code is ', df_merged.shape)
 print('df_merged.dtypes after add class_code, branch_code code is ', df_merged.dtypes)
@@ -296,17 +299,20 @@ df_feat_importance.to_csv('./model_output/df_feat_importance.csv', index=0, sep=
 # plt.show()
 
 def show_features_importance_bar(features, feature_importance):
-    plt.figure(figsize=(16, 6))
-    plt.yscale('log', nonposy='clip')
+    plt.figure(figsize=(25, 6))
+    #plt.yscale('log', nonposy='clip')
     plt.bar(range(len(feature_importance)), feature_importance, align='center')
     plt.xticks(range(len(feature_importance)), features, rotation='vertical')
     plt.title('Feature importance')
     plt.ylabel('Importance')
     plt.xlabel('Features')
+    plt.tight_layout()
     plt.show()
+    
 
+show_features_importance_bar(df_feat_importance['column'][:25],
+                             df_feat_importance['importance'][:25])
 
-show_features_importance_bar(feature_names[:22], lgbm.feature_importances_[:22])
 
 lgbm = lgb.LGBMClassifier(n_estimators=1000, n_jobs=-1, learning_rate=0.08, 
                          random_state=42, max_depth=7, min_child_samples=500,
