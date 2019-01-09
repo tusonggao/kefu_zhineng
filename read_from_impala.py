@@ -19,15 +19,13 @@ def read_sql_script(sql_file):
             sql_str += ' ' + content
     return sql_str
 
+
 def basefilename(full_file_name):
     file_name = os.path.split(full_file_name)[-1]
     raw_file_name = os.path.splitext(file_name)[0]
     print('raw_file_name is', raw_file_name)
     return raw_file_name
 
-# print(basefilename('test.csv'))
-# print(basefilename('c:/csv/test.csv'))
-# print(basefilename('./test.csv'))
 
 def read_and_store_df_from_impala(sql_file):
     print('reading start...')
@@ -49,29 +47,10 @@ def read_and_store_df_from_impala(sql_file):
     return df
 
 
-# with open("./111.json", 'r', encoding='UTF-8') as f:
-# with open('./wanzheng.json', 'r', encoding='UTF-8') as f:
-#     temp = json.loads(f.read())
-#     #print(temp)
-#     #print(temp['RECORDS'])
-#     print(len(temp['RECORDS']))
-#     print(temp['RECORDS'][1]['Id'])
-# print('hello world!')
-# conn_impala = create_engine('hive://172.21.57.127:21050')
-# sql = 'show databases;'
-# sql = read_sql_script('./sql_scripts/hive_sql_5.txt')
-
-# end_t = time.time()
-# print('df.shape is', df.shape)
-# print('df.head() is', df.head())
-# print('read data cost time ', end_t-start_t)
-# df.to_csv('./data/hive_sql_1_output.csv', index=0)
-
-
-# './sql_scripts/hive_sql_pos_instances.txt')
-
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
+
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
+
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_R.txt')
