@@ -80,7 +80,7 @@ def read_and_store_df_from_impala(sql_file):
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_M.txt')
 
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
 
 df = read_and_store_df_from_impala('./sql_scripts/hive_sql_last_order.txt')
 

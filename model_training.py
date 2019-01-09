@@ -158,7 +158,7 @@ print('df_merged.dtypes after add monetary is ', df_merged.dtypes)
 ###---------------------------------###
 df_first_order = pd.read_csv('./data/hive_sql_first_order_data.csv', 
                              parse_dates=[1, 2], infer_datetime_format=True,
-                             dtype={'first_origin_type': str, 'last_payment_type': str})
+                             dtype={'first_origin_type': str, 'first_payment_type': str})
 df_first_order['gap_days_first_order'] = (df_first_order['creation_date'] - df_first_order['order_dt']).dt.days
 df_first_order.drop(['order_dt'], axis=1, inplace=True)
 df_merged = pd.merge(df_merged, df_first_order, how='left', on=['buy_user_id', 'creation_date'])
@@ -225,7 +225,9 @@ print('\n-------------------------------------\n'
 #为了加快训练速度，进行采样
 # df_merged = df_merged.sample(100000) 
 
-df_merged = pd.get_dummies(df_merged, columns=['address_code', 'class_code', 'branch_code'])
+df_merged = pd.get_dummies(df_merged, 
+  columns=['address_code', 'class_code', 'branch_code', 'first_payment_type', 
+           'first_origin_type', 'last_payment_type', 'last_origin_type'])
 print('afte get_dummies, df_merged.shape is ', df_merged.shape)
 
 df_merged_train, df_merged_test = split_by_user_id(df_merged)
