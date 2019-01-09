@@ -116,7 +116,7 @@ print('df_merged dtypes is ', df_merged.dtypes)
 ###----------------------------###
 ###------ 加上R的feature  -----###
 ###----------------------------###
-df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
+# df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
 # df_recency = pd.read_csv('./data/hive_sql_R_data.csv')
 # df_recency['creation_date'] = pd.to_datetime(df_recency['creation_date'], 
 #     format='%Y-%m-%d %H:%M:%S', errors='ignore')
@@ -132,7 +132,7 @@ df_recency = pd.read_csv('./data/hive_sql_R_data.csv', parse_dates=[1, 2], infer
 # df_merged.drop(['gap_days'], axis=1, inplace=True)
 
 ###----------------------------###
-###------ 加上F的feature  -----###
+###------ 加上F的feature  ----- ###
 ###----------------------------###
 df_frequency = pd.read_csv('./data/hive_sql_F_data.csv', parse_dates=[1], infer_datetime_format=True)
 df_merged = pd.merge(df_merged, df_frequency, how='left', on=['buy_user_id', 'creation_date'])
@@ -158,7 +158,7 @@ print('df_merged.dtypes after add monetary is ', df_merged.dtypes)
 ###---------------------------------###
 df_first_order = pd.read_csv('./data/hive_sql_first_order_data.csv', 
                              parse_dates=[1, 2], infer_datetime_format=True,
-                             dtype={'last_origin_type': str, 'last_payment_type': str})
+                             dtype={'first_origin_type': str, 'last_payment_type': str})
 df_first_order['gap_days_first_order'] = (df_first_order['creation_date'] - df_first_order['order_dt']).dt.days
 df_first_order.drop(['order_dt'], axis=1, inplace=True)
 df_merged = pd.merge(df_merged, df_first_order, how='left', on=['buy_user_id', 'creation_date'])
