@@ -1,7 +1,8 @@
 /*  训练样例中所有buy_user_id的距离当前时间最近一次购买订单时间和金额  */
-select buy_user_id, creation_date, order_dt, order_cost from
+select buy_user_id, creation_date, order_dt, order_cost, last_origin_type, last_payment_type from
 (
-select b.buy_user_id buy_user_id, b.creation_date creation_date, a.order_cost/100.0 order_cost, a.creation_date order_dt, 
+select b.buy_user_id buy_user_id, b.creation_date creation_date, a.order_cost/100.0 order_cost, 
+a.creation_date order_dt, a.origin_type last_origin_type, a.payment_type last_payment_type,
 row_number() over (partition by b.buy_user_id, b.creation_date order by a.creation_date desc) as rn
 from jkbd.orders_parquet a join 
 (select buy_user_id, creation_date

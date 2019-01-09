@@ -22,17 +22,15 @@ random_seed = 42
 np.random.seed(random_seed)
 
 def convert_2_md5(value):
-    return str(hashlib.md5(str(value).encode('utf-8')).hexdigest())
+    return hashlib.md5(str(value).encode('utf-8')).hexdigest()
 
 def split_by_user_id(df_merged, train_ratio=0.67):
     df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
 
-    print('df_merged.dtypes is ', df_merged.dtypes)
-
     df_merged_sorted = df_merged.sort_values(by=['md5_val'])
     # print('df_merged_sorted head is ', df_merged_sorted.head(5))
-    df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', 
-        sep='\t', date_format='%Y/%m/%d', index=0)  # date_format='%Y-%m-%d %H:%M:%s'
+    # df_merged_sorted.to_csv('./data/hive_sql_merged_instances_sorted.csv', 
+    #     sep='\t', date_format='%Y/%m/%d', index=0)  # date_format='%Y-%m-%d %H:%M:%s'
     train_num = int(df_merged.shape[0]*train_ratio)
     pivot_val = df_merged_sorted.iloc[train_num]['md5_val']
     pivot_val_1 = df_merged_sorted.at[train_num, 'md5_val']
@@ -46,8 +44,8 @@ def split_by_user_id(df_merged, train_ratio=0.67):
     # df_merged_train = df_merged_sorted[:train_num]
     # df_merged_test = df_merged_sorted[train_num:]
 
-    df_merged_train.to_csv('./data/hive_sql_merged_instances_train.csv', sep='\t', index=0)
-    df_merged_test.to_csv('./data/hive_sql_merged_instances_test.csv', sep='\t', index=0)
+    # df_merged_train.to_csv('./data/hive_sql_merged_instances_train.csv', sep='\t', index=0)
+    # df_merged_test.to_csv('./data/hive_sql_merged_instances_test.csv', sep='\t', index=0)
 
     return df_merged_train, df_merged_test
 
