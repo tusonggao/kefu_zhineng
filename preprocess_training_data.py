@@ -148,10 +148,17 @@ print('df_merged.shape after add monetary is ', df_merged.shape)
 print('df_merged.dtypes after add monetary is ', df_merged.dtypes)
 
 
-###----------------------------###
-###-- 加上first order的feature -###
-###----------------------------###
-df_first_order = pd.read_csv('./data/hive_sql_first_order_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
+###---------------------------------###
+###   加上first order的features      ###
+###   包含：                         ###
+###   1. 订单距离电话回访时间的天数    ###
+###   2. 订单金额                    ###
+###   3. 订单来源                    ###
+###   4. 订单支付方式                ###
+###---------------------------------###
+df_first_order = pd.read_csv('./data/hive_sql_first_order_data.csv', 
+                             parse_dates=[1, 2], infer_datetime_format=True,
+                             dtype={'last_origin_type': str, 'last_payment_type': str})
 df_first_order['gap_days_first_order'] = (df_first_order['creation_date'] - df_first_order['order_dt']).dt.days
 df_first_order.drop(['order_dt'], axis=1, inplace=True)
 df_merged = pd.merge(df_merged, df_first_order, how='left', on=['buy_user_id', 'creation_date'])
@@ -159,10 +166,17 @@ print('df_merged.shape after add first order is ', df_merged.shape)
 print('df_merged.dtypes after add first order is ', df_merged.dtypes)
 
 
-###----------------------------###
-###-- 加上last order的feature -###
-###----------------------------###
-df_last_order = pd.read_csv('./data/hive_sql_last_order_data.csv', parse_dates=[1, 2], infer_datetime_format=True)
+###---------------------------------###
+###   加上last order的features       ###
+###   包含：                         ###
+###   1. 订单距离电话回访时间的天数    ###
+###   2. 订单金额                    ###
+###   3. 订单来源                    ###
+###   4. 订单支付方式                ###
+###---------------------------------###
+df_last_order = pd.read_csv('./data/hive_sql_last_order_data.csv', 
+                            parse_dates=[1, 2], infer_datetime_format=True,
+                            dtype={'last_origin_type': str, 'last_payment_type': str})
 df_last_order['gap_days_last_order'] = (df_last_order['creation_date'] - df_last_order['order_dt']).dt.days
 df_last_order.drop(['order_dt'], axis=1, inplace=True)
 df_merged = pd.merge(df_merged, df_last_order, how='left', on=['buy_user_id', 'creation_date'])
