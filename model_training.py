@@ -225,9 +225,6 @@ df_merged['call_month'] = df_merged['creation_date'].dt.month.apply(str)
 df_merged['call_weekday'] = df_merged['creation_date'].dt.weekday.apply(str)
 print('df_merged.shape after add start_app count, branch_code code is ', df_merged.shape)
 print('df_merged.dtypes after add start_app count, branch_code code is ', df_merged.dtypes)
-# df_dt.dt.month
-# s_w=df_dt.dt.weekday
-
 
 
 
