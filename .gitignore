@@ -4,6 +4,7 @@
 ~*.*
 data/
 model_output/
+sql_scripts_bakup/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

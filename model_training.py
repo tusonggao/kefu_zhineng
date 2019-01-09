@@ -185,7 +185,7 @@ print('df_merged.dtypes after add last order is ', df_merged.dtypes)
 
 
 ###----------------------------###
-###------ 加上地址的feature  ---###
+###--- 收货地址省份的feature  --###
 ###----------------------------###
 df_address = pd.read_csv('./data/hive_sql_address_data.csv', dtype={'rand_address_code': str})
 df_address.rename(columns={'rand_address_code':'address_code'}, inplace = True)
@@ -217,16 +217,31 @@ df_merged = pd.merge(df_merged, df_start_app_cnt, how='left', on=['buy_user_id',
 print('df_merged.shape after add start_app count, branch_code code is ', df_merged.shape)
 print('df_merged.dtypes after add start_app count, branch_code code is ', df_merged.dtypes)
 
+
+###----------------------------------------------------------###
+###------ 加上电话回访时间所在的月份的feature -----------------###
+###----------------------------------------------------------###
+df_merged['call_month'] = df_merged['creation_date'].dt.month.apply(str)
+df_merged['call_weekday'] = df_merged['creation_date'].dt.weekday.apply(str)
+print('df_merged.shape after add start_app count, branch_code code is ', df_merged.shape)
+print('df_merged.dtypes after add start_app count, branch_code code is ', df_merged.dtypes)
+# df_dt.dt.month
+# s_w=df_dt.dt.weekday
+
+
+
+
 print('\n-------------------------------------\n'
       '     data preprocess finished          \n'
-      '---------------------------------------\n');
+      '---------------------------------------\n')
 
 # df_merged = pd.get_dummies(df_merged)
 #为了加快训练速度，进行采样
 # df_merged = df_merged.sample(100000) 
 
 df_merged = pd.get_dummies(df_merged, 
-  columns=['address_code', 'class_code', 'branch_code', 'first_payment_type', 
+  columns=['address_code', 'class_code', 'branch_code', 
+           'call_month', 'call_weekday', 'first_payment_type', 
            'first_origin_type', 'last_payment_type', 'last_origin_type'])
 print('afte get_dummies, df_merged.shape is ', df_merged.shape)
 
