@@ -49,7 +49,7 @@ def read_and_store_df_from_impala(sql_file):
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
 
-df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
 
@@ -59,15 +59,19 @@ df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_M.txt')
 
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
 
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_last_order.txt')
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_last_order.txt')
 
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_address.txt')
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_address_num.txt')
 
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_patient_class.txt')
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_address.txt')
 
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_startapp_cnt.txt')
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_patient_class.txt')
+
+df = read_and_store_df_from_impala('./sql_scripts/hive_sql_startapp_cnt.txt')
+
+print('program ends')
 
 
 

@@ -1,4 +1,4 @@
-/*    得到回访30天内没有成交的回访记录，然后随机选择500万个，作为负样例    */
+/*    得到回访30天内没有成交的回访记录，然后随机选择500万个，作为负样例，总共有21856293个   */
 select t.id id, t.buy_user_id buy_user_id, t.operate_id operate_id, t.creation_date creation_date
 from
 (
