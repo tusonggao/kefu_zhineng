@@ -93,7 +93,7 @@ df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', parse_dates=[1],
 #     format='%Y-%m-%d %H:%M:%S')
 # df_merged['gap_days'] = (df_merged['creation_date'] - df_merged['creation_date']).dt.days
 
-sample_num = 2500000
+sample_num = 2000000
 
 #抽样100万做训练集
 df_merged = df_merged.sample(n=sample_num, random_state=42)
@@ -254,9 +254,7 @@ df_test_X = df_merged_test.drop(['y'], axis=1)
 
 feature_names = df_train_X.columns.tolist()
 
-d_train = lgb.Dataset(df_train_X.values, 
-                label=df_train_y.values, 
-                feature_name = feature_names, 
+d_train = lgb.Dataset(df_train_X.values, label=df_train_y.values, feature_name = feature_names, 
                 categorical_feature=['address_code', 'class_code', 'branch_code', 
                 'call_month', 'call_weekday', 'first_payment_type', 'first_origin_type', 
                 'last_payment_type', 'last_origin_type', 'first_order_status', 'last_order_status'])
@@ -284,13 +282,13 @@ print('auc_score is ', auc_score, 'predict cost time:', time.time()-start_t)
 print('top 200 ratio_multiple is',
       compute_density_multiple(df_test_y, y_pred, threshold=200, by_percentage=False),
       'top 500 ratio_multiple is',
-      compute_density_multiple(df_test_y, y_pred, threshold=500, by_percentage=False), 
+      compute_density_multiple(df_test_y, y_pred, threshold=500, by_percentage=False),
       'ratio_multiple top 1 is ', 
       compute_density_multiple(df_test_y, y_pred, threshold=1), 
       'ratio_multiple top 5 is ', 
       compute_density_multiple(df_test_y, y_pred, threshold=5), 
       'ratio_multiple top 10 is ', 
-      compute_density_multiple(df_test_y, y_pred, threshold=10), 
+      compute_density_multiple(df_test_y, y_pred, threshold=10),
       'ratio_multiple top 20 is ',
       compute_density_multiple(df_test_y, y_pred, threshold=20),
       'ratio_multiple top 30 is', 
