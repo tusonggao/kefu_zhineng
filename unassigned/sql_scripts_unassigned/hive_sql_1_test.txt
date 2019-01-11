@@ -1,0 +1,5 @@
+/* 这个脚本的功能是 */
+select to_date(a.creation_date) as date_str, count(*)
+from jkbd.Buy_User_Visit a
+where a.Creation_Date BETWEEN '2017-01-01 00:00:00' and '2018-12-20 00:00:00'
+group by to_date(a.creation_date) order by date_str;

@@ -1,0 +1,7 @@
+/*有成功购买过东西的buy_user_id 与 account_id的对应关系 */
+select max(t.id) buy_user_id, max(t.account_id) account_id
+from(
+select b.id id, b.account_id account_id
+from jkbd.orders a join jkbd.buy_user b 
+where a.buy_user_id=b.id and a.order_status in (50, 150)) t
+group by t.id;
