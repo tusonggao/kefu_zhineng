@@ -1,7 +1,7 @@
 /*  训练样例中所有buy_user_id对应最近30天的start app的次数 */
 /* 最后只得到22471个不同的buy_user_id的数据 31603行数据 总共包含494111个buy_user_id的数据*/
 select t.buy_user_id buy_user_id, t.creation_date creation_date, sum(c.cnt) cnt from 
-(select buy_user_id, creation_date from bigdata_ai.merged_buyuser_tsg group by buy_user_id, creation_date) t
+(select buy_user_id, creation_date from bigdata_ai.unassigned_buyuservisit_tsg group by buy_user_id, creation_date) t
 join 
 (select a.buy_user_id buy_user_id, b.date_str date_str, b.cnt cnt from 
 (select id buy_user_id, lower(account_id) account_id 

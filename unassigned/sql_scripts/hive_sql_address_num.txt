@@ -3,6 +3,6 @@ select a.buy_user_id, count(*) address_num
 from jkbd.buy_user_contract_parquet a 
 where a.buy_user_id in
 (select distinct buy_user_id
-from bigdata_ai.merged_buyuser_tsg)
+from bigdata_ai.unassigned_buyuservisit_tsg)
 and a.contract_type=4
 group by a.buy_user_id;

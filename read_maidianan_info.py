@@ -10,36 +10,37 @@ sql_tag = '/*SA(production)*/'
 
 start_t = time.time()
 
-sql = '''select u.second_id account_id, date, count(1) cnt 
+sql = '''select upper(u.second_id) account_id, date, count(1) cnt 
 from events e inner join users u on u.id = e.user_id 
 where event='$AppStart' and date>='2017-01-01'
 group by u.second_id, date order by u.second_id, date {sql_tag}; '''.format(sql_tag=sql_tag)
 
 print(sql)
-# df = pd.read_sql(sql, conn_sa)
+df = pd.read_sql(sql, conn_sa)
 
-# end_t = time.time()
-# print('read_sql cost time: ', end_t-start_t)
+end_t = time.time()
+print('read_sql cost time: ', end_t-start_t)
 
-# start_t = time.time()
-# df.to_csv('./data/df_maidian_info.csv')
-# end_t = time.time()
-# print('read_sql cost time: ', end_t-start_t)
+start_t = time.time()
+df.to_csv('./data/df_maidian_info.csv', index=False, sep='\t')
+end_t = time.time()
+print('read_sql cost time: ', end_t-start_t)
 
-# print(df.head(5))
-# print('df.shape is ', df.shape)
-
-df = pd.read_csv('./data/df_maidian_info.csv', index_col=0)
-
-df.to_csv('./data/df_maidian_info_noindex.csv', index=0, sep='\t')
-
-df_new = df.pivot(index='date', columns='account_id', values='cnt')
-
-print('df.head is ', df.head(5))
+print(df.head(5))
 print('df.shape is ', df.shape)
 
-print('df_new.head is ', df_new.head(5))
-print('df_new.shape is ', df_new.shape)
+
+# df = pd.read_csv('./data/df_maidian_info.csv', index_col=0)
+
+# df.to_csv('./data/df_maidian_info_noindex.csv', index=False, sep='\t')
+
+# df_new = df.pivot(index='date', columns='account_id', values='cnt')
+
+# print('df.head is ', df.head(5))
+# print('df.shape is ', df.shape)
+
+# print('df_new.head is ', df_new.head(5))
+# print('df_new.shape is ', df_new.shape)
 
 
 

@@ -25,7 +25,7 @@ def convert_2_md5(value):
     return hashlib.md5(str(value).encode('utf-8')).hexdigest()
 
 def split_by_user_id(df_merged, train_ratio=0.67):
-    df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5).apply(str)
+    df_merged['md5_val'] = df_merged['buy_user_id'].apply(convert_2_md5)
 
     df_merged_sorted = df_merged.sort_values(by=['md5_val'])
     # print('df_merged_sorted head is ', df_merged_sorted.head(5))
@@ -85,9 +85,12 @@ def compute_bottom_multiple(label_y, predict_y, threshold=10, by_percentage=True
 
 print('hello world')
 df_merged = pd.read_csv('./data/hive_sql_merged_instances.csv', parse_dates=[1],
-    infer_datetime_format=True, sep='\t', names=['buy_user_id', 'creation_date', 'y'])
+    infer_datetime_format=True, sep='\t')
+# df_merged['creation_date'] = pd.to_datetime(df_merged['creation_date'], 
+#     format='%Y-%m-%d %H:%M:%S')
+# df_merged['gap_days'] = (df_merged['creation_date'] - df_merged['creation_date']).dt.days
 
-sample_num = 500000
+sample_num = 1000000
 
 #抽样100万做训练集
 df_merged = df_merged.sample(n=sample_num, random_state=42)

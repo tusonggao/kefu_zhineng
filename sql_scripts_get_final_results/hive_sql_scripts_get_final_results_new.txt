@@ -1,0 +1,17 @@
+-- 得到最后的汇总结果
+select t1.buy_user_id buy_user_id, t1.branch_code branch_code, 
+t1.possibility possibility, t2.orders_code orders_code, 
+t2.creation_date last_orders_date, t2.last_order_cost last_order_cost from 
+(select a.buy_user_id buy_user_id, b.branch_code branch_code, a.possibility possibility
+from bigdata_ai.unassigned_possibility_tsg a join 
+(select buy_user_id, max(branch_code) branch_code
+from jkbd.buy_user_product_class_parquet group by buy_user_id) b
+where a.buy_user_id=b.buy_user_id) t1
+join 
+(select * from (
+select c.buy_user_id buy_user_id, c.creation_date creation_date, 
+c.orders_code orders_code, c.order_cost/100.0 last_order_cost,
+row_number() over (partition by c.buy_user_id order by c.creation_date desc) as rn
+from jkbd.orders_parquet c where c.order_status in (50, 70, 150)) t_temp
+where t_temp.rn=1) t2 
+order by t1.possibility desc;

@@ -5,7 +5,7 @@
 data/
 model_output/
 sql_scripts_bakup/
-unassigned/data_unassigned/
+unassigned/data/
 temp_bakup/
 
 # Byte-compiled / optimized / DLL files

@@ -11,6 +11,8 @@ def read_sql_script(sql_file):
     with open(sql_file, encoding='UTF-8') as file:
         for line in file:
             content = line.strip()
+            if content.startswith('--'):  # 过滤注释行
+                continue
             if content.find('/*')!=-1 and content.find('*/')!=-1:
                 start_idx = content.index('/*')
                 end_idx = content.index('*/')
@@ -28,7 +30,7 @@ def basefilename(full_file_name):
 
 
 def read_and_store_df_from_impala(sql_file):
-    print('reading start...')
+    print('read_and_store_df_from_impala: ', sql_file)
 
     start_t = time.time()
     conn_impala = create_engine('impala://172.21.57.127:21050')
@@ -49,11 +51,11 @@ def read_and_store_df_from_impala(sql_file):
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
 
-df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances_unassigned.txt')
 
-df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
+# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_R.txt')
 
@@ -74,6 +76,10 @@ df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_startapp_cnt.txt')
 
 # df = read_and_store_df_from_impala('./sql_scripts/hive_sql_unassigned_buyuser.txt')
+
+# df = read_and_store_df_from_impala('F:/kefu_zhineng/sql_scripts_get_final_results/hive_sql_scripts_get_final_results.txt')
+
+df = read_and_store_df_from_impala('F:/kefu_zhineng/sql_scripts_get_final_results/hive_sql_scripts_get_final_results_new.txt')
 
 print('program ends')
 

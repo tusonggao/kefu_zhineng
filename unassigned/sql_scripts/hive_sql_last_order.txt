@@ -6,7 +6,7 @@ a.creation_date order_dt, a.origin_type last_origin_type, a.payment_type last_pa
 row_number() over (partition by b.buy_user_id, b.creation_date order by a.creation_date desc) as rn
 from jkbd.orders_parquet a join 
 (select buy_user_id, creation_date
-from bigdata_ai.merged_buyuser_tsg
+from bigdata_ai.unassigned_buyuservisit_tsg
 group by buy_user_id, creation_date) b
 where a.buy_user_id=b.buy_user_id and date_add(a.creation_date, 1)<=to_date(b.creation_date)
 and a.order_status in (50, 70, 150)

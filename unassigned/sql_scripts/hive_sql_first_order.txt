@@ -1,4 +1,4 @@
-/*  训练样例中所有buy_user_id的第一次购买时间、订单金额、订单类型、支付类型、订单状态   */
+-- 训练样例中所有buy_user_id的第一次购买时间、订单金额、订单类型、支付类型、订单状态
 select buy_user_id, creation_date, order_dt, first_order_cost, 
 first_origin_type, first_payment_type, first_order_status from(
 select b.buy_user_id buy_user_id, b.creation_date creation_date, a.order_cost/100.0 first_order_cost, 
@@ -6,7 +6,7 @@ a.creation_date order_dt, a.origin_type first_origin_type, a.payment_type first_
 row_number() over (partition by b.buy_user_id, b.creation_date order by a.creation_date) as rn
 from jkbd.orders_parquet a join 
 (select buy_user_id, creation_date
-from bigdata_ai.merged_buyuser_tsg
+from bigdata_ai.unassigned_buyuservisit_tsg
 group by buy_user_id, creation_date) b
 where a.buy_user_id=b.buy_user_id and date_add(a.creation_date, 1)<=to_date(b.creation_date)
 and a.order_status in (50, 150)
