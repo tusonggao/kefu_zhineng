@@ -14,7 +14,7 @@ print(branch_code_map)
 # print(df_results.head(10))
 
 df_results = pd.read_csv('./data/hive_sql_scripts_get_final_results_new_data.csv', 
-                         dtype={'branch_code': int})
+                         dtype={'branch_code': int, 'orders_code': str})
 print(df_results.head(10))
 
 print('df_results.columns.tolist() ', df_results.columns.tolist())
@@ -28,6 +28,7 @@ df_results = df_results.iloc[:top]
 df_results['branch_code_chinese'] = df_results['branch_code'].map(branch_code_map)
 df_results = df_results[['buy_user_id', 'orders_code', 'last_orders_date', 'last_order_cost', 
                          'branch_code_chinese', 'branch_code', 'possibility']]
+
 
 # buy_user_id,branch_code,possibility,orders_code,last_orders_date,last_order_cost
 
