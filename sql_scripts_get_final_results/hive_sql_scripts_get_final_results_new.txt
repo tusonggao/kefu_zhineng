@@ -14,4 +14,5 @@ c.orders_code orders_code, c.order_cost/100.0 last_order_cost,
 row_number() over (partition by c.buy_user_id order by c.creation_date desc) as rn
 from jkbd.orders_parquet c where c.order_status in (50, 70, 150)) t_temp
 where t_temp.rn=1) t2 
+where t1.buy_user_id=t2.buy_user_id 
 order by t1.possibility desc;
