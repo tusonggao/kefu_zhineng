@@ -1,9 +1,3 @@
--- 得到最后的汇总结果
-select t4.buy_user_id buy_user_id, t4.branch_code branch_code, 
-t4.possibility possibility, t4.orders_code orders_code, 
-t4.creation_date last_orders_date, t4.last_order_cost last_order_cost,
-t5.dept_code_cn dept_code_cn from  
-(
 select t1.buy_user_id buy_user_id, t1.branch_code branch_code, 
 t1.possibility possibility, t2.orders_code orders_code, 
 t2.creation_date last_orders_date, t2.last_order_cost last_order_cost from 
@@ -20,12 +14,4 @@ row_number() over (partition by c.buy_user_id order by c.creation_date desc) as 
 from jkbd.orders_parquet c where c.order_status in (50, 70, 150)) t_temp
 where t_temp.rn=1) t2 
 where t1.buy_user_id=t2.buy_user_id 
-) t4 
-join
-(
-select tt1.id buy_user_id, tt2.dept_code_cn dept_code_cn
-from jkbd.buy_user_parquet tt1 join bigdata_ai.dept_code_map_tsg tt2
-where tt1.dept_code=tt2.dept_code) t5
-where t4.buy_user_id=t5.buy_user_id
-order by t4.possibility desc;
-
+order by t1.possibility desc;

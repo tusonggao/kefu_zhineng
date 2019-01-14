@@ -86,8 +86,8 @@ def compute_density_multiple(y_true, y_predict, threshold=10, by_percentage=True
     return density_mutiple
 
 def generate_real_test_df_quick():
-    df_test_real = pd.read_csv('./unassigned/data/hive_sql_unassigned_buyuser_output_processed', 
-                       sep='\t')
+    df_test_real = pd.read_csv('./unassigned/data/hive_sql_unassigned_buyuser_output_processed',
+                               sep='\t')
     print('df_test_real.shape is ', df_test_real.shape)
     return df_test_real
 
@@ -197,11 +197,10 @@ def generate_real_test_df():
 def get_training_data_quick():
     print('in get_training_data_quick()')
     start_t = time.time()
-    df_merged = pd.read_csv('./data/df_merged_processed', parse_dates=[1],
-        infer_datetime_format=True, sep='\t')
-    print('store df_merged to_csv cost time: ', time.time()-start_t)
+    df_merged = pd.read_csv('./data/df_merged_processed', sep='\t')
+    print('read df_merged from csv cost time: ', time.time()-start_t,
+          'df_merged.shape:', df_merged.shape)
     return df_merged
-
 
 def get_training_data():
     print('in get_training_data()')
@@ -353,13 +352,14 @@ def get_training_data():
     return df_merged
 
 
-df_merged = get_training_data()
+# df_merged = get_training_data()
+df_merged = get_training_data_quick()
 
 print('\n-------------------------------------\n'
       '     data preprocess finished          \n'
       '---------------------------------------\n')
 
-df_merged_train, df_merged_test = split_by_user_id(df_merged)
+df_merged_train, df_merged_test = split_by_user_id(df_merged, train_ratio=0.95)
 del df_merged
 
 df_merged_train.drop(['buy_user_id', 'creation_date', 'md5_val'], axis=1, inplace=True)
@@ -443,7 +443,8 @@ gc.collect()
 
 ###########################################################################################
 
-df_test_real = generate_real_test_df()
+# df_test_real = generate_real_test_df()
+df_test_real = generate_real_test_df_quick()
 print('after generate_real_test_df df_test_real shape is ', df_test_real.shape)
 
 final_outcome = pd.DataFrame()
@@ -454,6 +455,7 @@ print('start real_test!!! ')
 start_t = time.time()
 y_pred=clf.predict(df_test_real.values)
 final_outcome['y'] = y_pred
+# final_outcome['y'] = np.round(y_pred, 8)
 print('y_pred.shape is ', y_pred.shape, 'df_test_real.shape is ', df_test_real.shape)
 print('final predict cost time:', time.time()-start_t)
 
