@@ -1,7 +1,7 @@
 -- 得到最后的汇总结果
 select t4.buy_user_id buy_user_id, t4.branch_code branch_code, 
 t4.possibility possibility, t4.orders_code orders_code, 
-t4.creation_date last_orders_date, t4.last_order_cost last_order_cost,
+t4.last_orders_date last_orders_date, t4.last_order_cost last_order_cost,
 t5.dept_code_cn dept_code_cn from  
 (
 select t1.buy_user_id buy_user_id, t1.branch_code branch_code, 
