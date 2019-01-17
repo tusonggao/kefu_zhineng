@@ -359,7 +359,7 @@ print('\n-------------------------------------\n'
       '     data preprocess finished          \n'
       '---------------------------------------\n')
 
-df_merged_train, df_merged_test = split_by_user_id(df_merged, train_ratio=0.95)
+df_merged_train, df_merged_test = split_by_user_id(df_merged, train_ratio=0.67)
 del df_merged
 
 df_merged_train.drop(['buy_user_id', 'creation_date', 'md5_val'], axis=1, inplace=True)

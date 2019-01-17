@@ -43,45 +43,20 @@ def read_and_store_df_from_impala(sql_file):
     print('df.shape is', df.shape)
     print('df.head() is', df.head())
 
-    output_file = basefilename(sql_file) + '_data.csv'
-    df.to_csv('./data/'+output_file, index=0)
+    # df['product_code'] = df['product_code'].apply(lambda x: '%06d'%(x))
+
+    csv_output_file = basefilename(sql_file) + '_data.csv'
+    excel_output_file = basefilename(sql_file) + '_data.xlsx'
+    
+    df.to_csv('./data/' + csv_output_file, index=0)
+    df.to_excel('./data/' + excel_output_file, index=0)
+    df[['product_name', 'product_code']].to_excel('./data/' + '产品列表.xlsx', index=0)
 
     return df
 
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_1.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_pos_instances_unassigned.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_neg_instances.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_R.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_F.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_M.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_first_order.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_last_order.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_address_num.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_address.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_patient_class.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_startapp_cnt.txt')
-
-# df = read_and_store_df_from_impala('./sql_scripts/hive_sql_unassigned_buyuser.txt')
-
-# df = read_and_store_df_from_impala('F:/kefu_zhineng/sql_scripts_get_final_results/hive_sql_scripts_get_final_results.txt')
-
-# df = read_and_store_df_from_impala('F:/kefu_zhineng/sql_scripts_get_final_results/hive_sql_scripts_get_final_results_new.txt')
-
 df = read_and_store_df_from_impala('F:/kefu_zhineng/product_script/hive_sql_product_script.txt')
+
+print('df.dtypes is ', df.dtypes)
 
 print('program ends')
 
